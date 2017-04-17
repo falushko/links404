@@ -3,6 +3,14 @@
     width: 100%;
 }
 
+.top-margined {
+    margin-top: 5%;
+}
+
+.bottom-margined {
+    margin-bottom: 5%;
+}
+
 form {
     margin: auto;
     width: 100%;
