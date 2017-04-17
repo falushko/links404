@@ -1,0 +1,13 @@
+.wrapper {
+    text-align: center;
+    width: 100%;
+}
+
+form {
+    margin: auto;
+    width: 100%;
+}
+
+.submit{
+    width: 100%;
+}

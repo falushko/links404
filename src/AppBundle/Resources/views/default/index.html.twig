@@ -38,11 +38,19 @@
 
     <!-- Begin page content -->
     <div class="container">
-        <div class="page-header">
-            <h1>Sticky footer with fixed navbar</h1>
+        <div class="col-md-10 col-md-offset-1 wrapper">
+            <h1 class="col-md-6 col-md-offset-2">Find all 404 links on your site</h1>
+            <form>
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <input type="email" class="form-control" id="website" aria-describedby="emailHelp" placeholder="Enter website">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary submit">Submit</button>
+                </div>
+            </form>
         </div>
-        <p class="lead">Pin a fixed-height footer to the bottom of the viewport in desktop browsers with this custom HTML and CSS. A fixed navbar has been added with <code>padding-top: 60px;</code> on the <code>body &gt; .container</code>.</p>
-        <p>Back to <a href="../sticky-footer">the default sticky footer</a> minus the navbar.</p>
     </div>
 
     <footer class="footer">
