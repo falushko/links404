@@ -3,14 +3,15 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
-class MainController extends Controller
+class MainController extends AppController
 {
     /**
      * @Route("/", name="homepage")
+     * @Method({"GET"})
      * @Template
      */
     public function indexAction()
@@ -20,6 +21,7 @@ class MainController extends Controller
 
     /**
      * @Route("/result", name="result")
+     * @Method({"GET"})
      * @Template
      */
     public function resultAction()
@@ -29,6 +31,7 @@ class MainController extends Controller
 
     /**
      * @Route("/about", name="about")
+     * @Method({"GET"})
      * @Template
      */
     public function aboutAction()
@@ -38,10 +41,14 @@ class MainController extends Controller
 
     /**
      * @Route("/contacts", name="contacts")
+     * @Method({"GET", "POST"})
      * @Template
+     * @param Request $request
      */
-    public function contactsAction()
+    public function contactsAction(Request $request)
     {
+        if ($request->getMethod() === 'GET') return;
+
 
     }
 }
