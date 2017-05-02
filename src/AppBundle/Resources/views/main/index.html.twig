@@ -1,8 +1,6 @@
-{% extends 'base.html.twig' %}
+{% extends '@App/layout.html.twig' %}
 
-{% block body %}
-    {% include '@App/navbar.html.twig' %}
-
+{% block content %}
     <div class="container">
         <div class="col-md-10 col-md-offset-1 wrapper top-margined">
             <h1 class="col-md-6 col-md-offset-2 bottom-margined">Find all 404 links on your site</h1>
@@ -18,6 +16,4 @@
             </form>
         </div>
     </div>
-
-    {% include '@App/footer.html.twig' %}
 {% endblock %}
