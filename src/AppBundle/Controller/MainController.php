@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Feedback;
+use AppBundle\Form\FeedbackType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -44,11 +46,18 @@ class MainController extends AppController
      * @Method({"GET", "POST"})
      * @Template
      * @param Request $request
+     * @return void|array
      */
     public function contactsAction(Request $request)
     {
         if ($request->getMethod() === 'GET') return;
 
+        $feedback = $this->createFromArray(new Feedback(), $request->request->all());
 
+        if (!$this->isValid($feedback)) return ['errors' => $this->errors, 'fields' => $request->request->all()];
+
+        $this->save($feedback);
+
+        return ['success' => 'Thank you for your feedback!'];
     }
 }
