@@ -3,7 +3,6 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Feedback;
-use AppBundle\Form\FeedbackType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -16,10 +15,14 @@ class MainController extends AppController
      * @Method({"GET"})
      * @Template
      */
-    public function indexAction()
-    {
+    public function indexAction(){}
 
-    }
+    /**
+     * @Route("/about", name="about")
+     * @Method({"GET"})
+     * @Template
+     */
+    public function aboutAction(){}
 
     /**
      * @Route("/result", name="result")
@@ -27,16 +30,6 @@ class MainController extends AppController
      * @Template
      */
     public function resultAction()
-    {
-
-    }
-
-    /**
-     * @Route("/about", name="about")
-     * @Method({"GET"})
-     * @Template
-     */
-    public function aboutAction()
     {
 
     }
@@ -54,7 +47,10 @@ class MainController extends AppController
 
         $feedback = $this->createFromArray(new Feedback(), $request->request->all());
 
-        if (!$this->isValid($feedback)) return ['errors' => $this->errors, 'fields' => $request->request->all()];
+        if (!$this->isValid($feedback)) return [
+            'errors' => $this->errors,
+            'fields' => $request->request->all()
+        ];
 
         $this->save($feedback);
 
