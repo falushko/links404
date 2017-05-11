@@ -31,7 +31,7 @@ class MainController extends AppController
      */
     public function resultAction()
     {
-
+        $this->get('app.crawler')->crawl('');
     }
 
     /**

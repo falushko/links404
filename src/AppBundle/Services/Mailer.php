@@ -1,18 +1,18 @@
 <?php
 
-namespace AppBundle\Mailer;
+namespace AppBundle\Services;
 
 use AppBundle\Entity\Feedback;
 use Swift_Message;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class AppMailer
+class Mailer
 {
     const FEEDBACK_MAIL = 'signal@checkmyart.com';
 
     private $container;
 
-    public function __construct(Container $container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }

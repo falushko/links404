@@ -1,9 +1,9 @@
-# Learn more about services, parameters and containers at
-# http://symfony.com/doc/current/service_container.html
 parameters:
-#    parameter_name: value
 
 services:
     app.mailer:
-        class: AppBundle\Mailer\AppMailer
+        class: AppBundle\Services\Mailer
         arguments: ["@service_container"]
+
+    app.crawler:
+        class: AppBundle\Services\Crawler
