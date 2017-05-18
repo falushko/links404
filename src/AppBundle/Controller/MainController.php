@@ -31,7 +31,9 @@ class MainController extends AppController
      */
     public function resultAction()
     {
-        $this->get('app.crawler')->crawl('http://hand-build.ru');
+        $links = $this->get('app.crawler')->crawl('http://hand-build.ru');
+
+        dump($links); exit();
     }
 
     /**

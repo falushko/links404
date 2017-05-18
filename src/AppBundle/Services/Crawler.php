@@ -2,7 +2,6 @@
 
 namespace AppBundle\Services;
 
-use ArrayIterator;
 use GuzzleHttp\Client as HTTPClient;
 use PHPHtmlParser\Dom;
 use SimpleXMLElement;
@@ -21,85 +20,92 @@ class Crawler
      */
     public function crawl(string $website) : array
     {
+        $brokenMediaLinks = [];
+        $brokenLinksWithStatuses = [];
+        $pages = $this->getAllWebsitePages($website);
 
-        $this->getAllWebsitePages($website);
+        foreach ($pages as $page) {
 
-        $result = [];
+            $dom = new Dom;
+            $dom->load($page);
+            $links = $dom->find('a');
 
-        $dom = new Dom;
-        $dom->load($website);
-        $links = $dom->find('a');
+            foreach ($links as $link) {
+                $link = $link->tag->getAttribute('href')['value'];
 
-        foreach($links as $link) {
-            $link = $link->tag->getAttribute('href')['value'];
-            $media = $this->isLinkToMedia($link);
-            $broken = $this->isMediaDoesNotExist($link);
-            $outbound = $this->isLinkOutbound($link, $website);
-            $status = $this->getHTTPResponseStatus($link);
+                if ($this->isLinkToMedia($link)) {
+                    if ($this->isMediaNotExist($link)) continue;
+
+                    $brokenMediaLinks[] = ['page' => $page, 'link' => $link];
+                } else {
+
+                    try {
+                        $status = $this->getHTTPResponseStatus($link);
+
+                        if ($status['code'] === 200) continue;
+
+                        $brokenLinksWithStatuses[] = ['page' => $page, 'link' => $link, 'status' => $status];
+                    } catch (\Exception $exception) {
+
+                    }
+                }
+            }
         }
+
+        return ['brokenLinks' => $brokenLinksWithStatuses, 'brokenMedia' => $brokenMediaLinks];
     }
 
     /**
+     * Get all website pages.
      * @param string $website
      * @return array
      */
     public function getAllWebsitePages(string $website) : array
     {
-        $pages = [];
+        $pages[] = $website;
+        $counter = 0;
 
-        $client = new HTTPClient();
-        $response = $client->get($website . '/sitemhap.xml', ['exceptions' => false]);
+        while (true) {
+            if ($counter >= count($pages)) break;
 
-        if ($response->getStatusCode() === 200) {
-            $links = new SimpleXMLElement($response->getBody());
+            $dom = new Dom;
+            $dom->load($pages[$counter]);
+            $links = $dom->find('a');
 
-            foreach ($links as $link) $pages[] = (string) $link->loc;
+            foreach ($links as $link) {
+                $link = $link->tag->getAttribute('href')['value'];
 
-            dump($pages, '1'); exit();
-        } else {
+                if ($this->isLinkOutbound($link, $website)) continue;
+                if ($this->isLinkToMedia($link)) continue;
+                if (in_array($link, $pages)) continue;
 
-            $pages[] = $website;
-            $counter = 0;
-
-            while (true) {
-                if ($counter >= count($pages)) break;
-
-                $dom = new Dom;
-                $dom->load($pages[$counter]);
-                $links = $dom->find('a');
-
-                foreach ($links as $link) {
-                    $link = $link->tag->getAttribute('href')['value'];
-
-                    if ($this->isLinkOutbound($link, $website)) continue;
-                    if ($this->isLinkToMedia($link)) continue;
-                    if (in_array($link, $pages)) continue;
-
-                    $pages[] = $link;
-                }
-
-                $counter++;
+                $pages[] = $link;
             }
 
-
-            dump($pages, '2'); exit();
-
+            $counter++;
         }
 
-//
-//        $arr = array();
-//        $arr['b'] = 'book';
-//
-//        $array_iterator = new ArrayIterator($arr);
-//
-//
-//        foreach($array_iterator as $key=>$val) {
-//            print "key=>$key\n";
-//            if(!isset($array_iterator['a']))
-//                $array_iterator['a'] = 'apple';
-//        }
+        return $pages;
+    }
 
+    /**
+     * Get all website pages from sitemap.xml. Only one level sitemap is allowed.
+     * @param string $website
+     * @return array
+     * @throws \Exception
+     */
+    public function getAllWebsitePagesFromSitemap(string $website) : array
+    {
+        $pages = [];
+        $client = new HTTPClient();
+        $response = $client->get($website . '/sitemap.xml', ['exceptions' => false]);
 
+        //todo create custom exception and handle it
+        if ($response->getStatusCode() !== 200) throw new \Exception();
+
+        $links = new SimpleXMLElement($response->getBody());
+
+        foreach ($links as $link) $pages[] = (string)$link->loc;
 
         return $pages;
     }
@@ -138,15 +144,13 @@ class Crawler
     public function getHTTPResponseStatus(string $link) : array
     {
         $client = new HTTPClient();
-        $response = $client->request('GET', $link);
+        $response = $client->head($link, ['exceptions' => false]);
 
         return [
             'code' => $response->getStatusCode(),
             'phrase' => $response->getReasonPhrase()
         ];
     }
-
-    //todo add broken images checker
 
     /**
      * Check if link is picture, video or mp3.
@@ -158,9 +162,15 @@ class Crawler
         $medias = ['.jpeg', '.jpg', '.gif', '.png', '.flv', '.mp3', '.mp4'];
 
         foreach ($medias as $media) {
-            /** Check if link ends with $medias */
-            if (substr_compare($link, $media, strlen($link)-strlen($media), strlen($media)) === 0) {
-                return true;
+
+            try {
+                /** Check if link ends with $medias */
+                if (substr_compare($link, $media, strlen($link) - strlen($media), strlen($media)) === 0) {
+                    return true;
+                }
+
+            } catch (\Exception $exception) {
+
             }
         }
 
@@ -172,7 +182,7 @@ class Crawler
      * @param string $link
      * @return bool
      */
-    public function isMediaDoesNotExist(string $link) : bool
+    public function isMediaNotExist(string $link) : bool
     {
         return $this->getHTTPResponseStatus($link)['code'] !== 200 ? true : false;
     }
