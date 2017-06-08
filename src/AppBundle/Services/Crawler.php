@@ -24,6 +24,8 @@ class Crawler
         $brokenLinksWithStatuses = [];
         $pages = $this->getAllWebsitePages($website);
 
+        dump($pages); exit();
+
         foreach ($pages as $page) {
 
             $dom = new Dom;
@@ -68,21 +70,27 @@ class Crawler
         while (true) {
             if ($counter >= count($pages)) break;
 
-            $dom = new Dom;
-            $dom->load($pages[$counter]);
-            $links = $dom->find('a');
+            try {
+                $dom = new Dom;
+                $dom->load($pages[$counter]);
+                $links = $dom->find('a');
 
-            foreach ($links as $link) {
-                $link = $link->tag->getAttribute('href')['value'];
+                foreach ($links as $link) {
+                    $link = $link->tag->getAttribute('href')['value'];
 
-                if ($this->isLinkOutbound($link, $website)) continue;
-                if ($this->isLinkToMedia($link)) continue;
-                if (in_array($link, $pages)) continue;
+                    if ($this->isLinkOutbound($link, $website)) continue;
+                    if ($this->isLinkToMedia($link)) continue;
+                    if (in_array($link, $pages)) continue;
 
-                $pages[] = $link;
+                    $pages[] = $link;
+                }
+
+                $counter++;
+
+            } catch (\Exception $exception) {
+
             }
 
-            $counter++;
         }
 
         return $pages;
@@ -105,7 +113,7 @@ class Crawler
 
         $links = new SimpleXMLElement($response->getBody());
 
-        foreach ($links as $link) $pages[] = (string)$link->loc;
+        foreach ($links as $link) $pages[] = (string) $link->loc;
 
         return $pages;
     }
@@ -133,7 +141,7 @@ class Crawler
      */
     public function isLinkOutbound(string $link, string $website) : bool
     {
-        return (strpos($link, $website) !== false) ? false : true;
+        return strpos($link, $website) !== false || strpos($link, "http") !== 0 ? false : true;
     }
 
     /**

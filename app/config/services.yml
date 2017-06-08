@@ -3,7 +3,7 @@ parameters:
 services:
     app.mailer:
         class: AppBundle\Services\Mailer
-        arguments: ["@service_container"]
+        arguments: ["@twig", "@mailer"]
 
     app.crawler:
         class: AppBundle\Services\Crawler

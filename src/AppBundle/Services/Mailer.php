@@ -4,30 +4,31 @@ namespace AppBundle\Services;
 
 use AppBundle\Entity\Feedback;
 use Swift_Message;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Mailer
 {
-    const FEEDBACK_MAIL = 'signal@checkmyart.com';
+    private $twig;
+    private $mailer;
+    const FEEDBACKS_EMAIL = '404links@gmail.com';
 
-    private $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(\Twig_Environment $twig, \Swift_Mailer $mailer)
     {
-        $this->container = $container;
+        $this->twig = $twig;
+        $this->mailer = $mailer;
     }
 
     public function sendFeedbackMail(Feedback $feedback)
     {
-        $body = $this->container->get('twig')
-            ->render('@App/emails/activation.html.twig', [
-                'link' => $user->getActivationCode(),
-            ]);
+        $body = $this->twig
+            ->render('@App/mails/feedback.html.twig', [
+                'name' => $feedback->name,
+                'email' => $feedback->email,
+                'body' => $feedback->message]);
 
-        $this->container->get('mailer')->send(Swift_Message::newInstance()
+        $this->mailer->send(Swift_Message::newInstance()
             ->setSubject('404links feedback')
-            ->setFrom('vov8278@gmail.com')
-            ->setTo(self::FEEDBACK_MAIL)
+            ->setFrom($feedback->email)
+            ->setTo(self::FEEDBACKS_EMAIL)
             ->setBody($body, 'text/html')
         );
     }
