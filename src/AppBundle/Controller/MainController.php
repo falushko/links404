@@ -51,7 +51,7 @@ class MainController extends AppController
      * @Method({"GET", "POST"})
      * @Template
      * @param Request $request
-     * @return void|array
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse|void
      */
     public function contactsAction(Request $request)
     {
@@ -65,11 +65,8 @@ class MainController extends AppController
         ];
 
         $this->save($feedback);
+        $this->addFlash('success', 'Thank you for your feedback!');
 
-        //todo move this to doctrine listener
-        $this->get('app.mailer.producer')->publish(serialize($feedback));
-
-        //todo redirect with param
-        return ['success' => 'Thank you for your feedback!'];
+        return $this->redirectToRoute('contacts');
     }
 }

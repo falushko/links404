@@ -8,4 +8,10 @@ services:
     app.crawler:
         class: AppBundle\Services\Crawler
 
+    app.feedback.listener:
+        class: AppBundle\Listener\FeedbackListener
+        arguments: ["@app.mailer.producer"]
+        tags:
+            - { name: doctrine.event_listener, event: postPersist }
+
     app.mailer.producer: '@old_sound_rabbit_mq.mail_producer'

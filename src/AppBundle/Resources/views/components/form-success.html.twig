@@ -1,5 +1,5 @@
-{% if success is defined %}
+{% for message in app.session.flashBag.get('success') %}
     <div class="form-group">
-        <div class="alert alert-success" role="alert">{{ success }}</div>
+        <div class="alert alert-success" role="alert">{{ message }}</div>
     </div>
-{% endif %}
+{% endfor %}
