@@ -3,9 +3,11 @@
 namespace AppBundle\Services;
 
 use AppBundle\Entity\Feedback;
+use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
+use PhpAmqpLib\Message\AMQPMessage;
 use Swift_Message;
 
-class Mailer
+class Mailer implements ConsumerInterface
 {
     private $twig;
     private $mailer;
@@ -17,8 +19,11 @@ class Mailer
         $this->mailer = $mailer;
     }
 
-    public function sendFeedbackMail(Feedback $feedback)
+    public function execute(AMQPMessage $message)
     {
+        /** @var Feedback $feedback */
+        $feedback = unserialize($message->getBody());
+
         $body = $this->twig
             ->render('@App/mails/feedback.html.twig', [
                 'name' => $feedback->name,

@@ -66,8 +66,10 @@ class MainController extends AppController
 
         $this->save($feedback);
 
-        $this->get('app.mailer')->sendFeedbackMail($feedback);
+        //todo move this to doctrine listener
+        $this->get('app.mailer.producer')->publish(serialize($feedback));
 
+        //todo redirect with param
         return ['success' => 'Thank you for your feedback!'];
     }
 }

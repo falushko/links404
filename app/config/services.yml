@@ -7,3 +7,5 @@ services:
 
     app.crawler:
         class: AppBundle\Services\Crawler
+
+    app.mailer.producer: '@old_sound_rabbit_mq.mail_producer'

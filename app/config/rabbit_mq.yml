@@ -1,0 +1,25 @@
+old_sound_rabbit_mq:
+    connections:
+        default:
+            host:     'localhost'
+            port:     5672
+            user:     'guest'
+            password: 'guest'
+            vhost:    '/'
+            lazy:     true
+            connection_timeout: 3
+            read_write_timeout: 3
+            keepalive: false
+            heartbeat: 0
+    producers:
+        mail:
+            connection:       default
+            exchange_options: { name: 'mail', type: direct }
+            enable_logger: true
+    consumers:
+        mail:
+            connection:       default
+            exchange_options: { name: 'mail', type: direct }
+            queue_options:    { name: 'mail' }
+            callback:         app.mailer
+            enable_logger: true
