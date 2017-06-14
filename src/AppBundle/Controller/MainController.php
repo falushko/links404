@@ -32,18 +32,8 @@ class MainController extends AppController
      */
     public function resultAction()
     {
-//        $links = $this->get('app.crawler')->crawl('https://bablo.click');
-
-
-        $sitemap = new Sitemap();
-
-        //игнорировать ссылки с расширениями:
-        $sitemap->set_ignore(["javascript:", ".css", ".js", ".ico", ".jpg", ".png", ".jpeg", ".swf", ".gif"]);
-        $sitemap->get_links("http://hand-build.ru");
-        $links = $sitemap->get_array();
-
-
-        dump($links); exit();
+        $links = $this->get('app.crawler')->crawl('https://website.com');
+        //todo implement
     }
 
     /**
