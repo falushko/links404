@@ -63,7 +63,9 @@ class AppController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        foreach ($entities as $entity) { $em->persist($entity); }
+        foreach ($entities as $entity) {
+            $em->persist($entity);
+        }
 
         $em->flush();
     }

@@ -14,7 +14,7 @@ use SimpleXMLElement;
 class Crawler
 {
     /**
-     * Main method that makes the shit done.
+     * Main method that makes the things done.
      * @param $website
      * @return array
      */
@@ -23,8 +23,6 @@ class Crawler
         $brokenMediaLinks = [];
         $brokenLinksWithStatuses = [];
         $pages = $this->getAllWebsitePages($website);
-
-        dump($pages); exit();
 
         foreach ($pages as $page) {
 
@@ -47,8 +45,9 @@ class Crawler
                         if ($status['code'] === 200) continue;
 
                         $brokenLinksWithStatuses[] = ['page' => $page, 'link' => $link, 'status' => $status];
-                    } catch (\Exception $exception) {
 
+                    } catch (\Exception $exception) {
+                        //todo log
                     }
                 }
             }
@@ -88,7 +87,7 @@ class Crawler
                 $counter++;
 
             } catch (\Exception $exception) {
-
+                //todo log
             }
 
         }
@@ -128,7 +127,7 @@ class Crawler
     {
         $result = [];
 
-
+        //todo implementation
 
         return $result;
     }
@@ -178,7 +177,7 @@ class Crawler
                 }
 
             } catch (\Exception $exception) {
-
+                //todo log
             }
         }
 

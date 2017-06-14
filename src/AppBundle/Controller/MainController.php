@@ -65,7 +65,7 @@ class MainController extends AppController
         ];
 
         $this->save($feedback);
-        $this->addFlash('success', 'Thank you for your feedback!');
+        $this->addFlash('success', 'Thank\'s for your feedback!');
 
         return $this->redirectToRoute('contacts');
     }
