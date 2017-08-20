@@ -40,9 +40,7 @@ class FeedbackType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-        	'data_class' => Feedback::class,
-			'attr' => [
-				'novalidate'=>'novalidate']
+        	'data_class' => Feedback::class
 		]);
     }
 }
