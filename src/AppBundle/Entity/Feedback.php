@@ -42,4 +42,14 @@ class Feedback
      * )
      */
     public $message;
+
+	/**
+	 * @ORM\Column(type="datetime")
+	 */
+    public $createdAt;
+
+    public function __construct()
+	{
+		$this->createdAt = new \DateTime();
+	}
 }

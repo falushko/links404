@@ -36,13 +36,13 @@ class MainController extends AppController
         //todo implement
     }
 
-    /**
-     * @Route("/contacts", name="contacts")
-     * @Method({"GET", "POST"})
-     * @Template
-     * @param Request $request
-     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse|void
-     */
+	/**
+	 * @Route("/contacts", name="contacts")
+	 * @Method({"GET", "POST"})
+	 * @Template
+	 * @param Request $request
+	 * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+	 */
     public function contactsAction(Request $request)
     {
 		$feedback = new Feedback();
