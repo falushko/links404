@@ -8,7 +8,11 @@
         <div class="col-md-6 col-md-offset-3 top-margined">
             <h2>Please send us your feedback</h2>
 
-            {% include '@App/@partials/feedback-form.html.twig' %}
+            {{ form_start(form) }}
+                {% include '@App/@partials/form-success.html.twig' %}
+                {{ form_widget(form) }}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            {{ form_end(form) }}
 
         </div>
     </div>

@@ -1,0 +1,7 @@
+{% block form_row %}
+    <div class="form-group {% if not form.vars.valid %}has-error{% endif %}">
+        {{ form_label(form) }}
+        {{ form_widget(form) }}
+        {{ form_errors(form) }}
+    </div>
+{% endblock form_row %}
