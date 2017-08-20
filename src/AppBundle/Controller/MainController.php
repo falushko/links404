@@ -3,7 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Feedback;
-use AppBundle\Services\Sitemap;
+use AppBundle\Form\FeedbackType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -45,18 +45,16 @@ class MainController extends AppController
      */
     public function contactsAction(Request $request)
     {
-        if ($request->getMethod() === 'GET') return;
+		$feedback = new Feedback();
+		$form = $this->createForm(FeedbackType::class, $feedback);
+		$form->handleRequest($request);
 
-        $feedback = $this->createFromArray(new Feedback(), $request->request->all());
+		if ($form->isSubmitted() && $form->isValid()) {
+			$this->save($feedback);
+			$this->addFlash('success', 'Thank\'s for your feedback!');
+			return $this->redirectToRoute('contacts');
+		}
 
-        if (!$this->isValid($feedback)) return [
-            'errors' => $this->errors,
-            'fields' => $request->request->all()
-        ];
-
-        $this->save($feedback);
-        $this->addFlash('success', 'Thank\'s for your feedback!');
-
-        return $this->redirectToRoute('contacts');
+		return ['form' => $form->createView()];
     }
 }

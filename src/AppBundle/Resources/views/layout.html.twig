@@ -1,9 +1,9 @@
-{% extends 'base.html.twig' %}
+{% extends '@App/base.html.twig' %}
 
 {% block body %}
-    {% include '@App/components/navbar.html.twig' %}
+    {% include '@App/@partials/navbar.html.twig' %}
 
     {% block content %}{% endblock %}
 
-    {% include '@App/components/footer.html.twig' %}
+    {% include '@App/@partials/footer.html.twig' %}
 {% endblock %}

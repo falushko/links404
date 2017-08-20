@@ -19,3 +19,9 @@ form {
 .submit{
     width: 100%;
 }
+
+.error_list{
+    list-style-type: none;
+    color: #a50000;
+    margin: 0 0 -10px -38px;
+}
