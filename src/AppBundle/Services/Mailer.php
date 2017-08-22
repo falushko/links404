@@ -22,8 +22,7 @@ class Mailer implements ConsumerInterface
     {
         $feedback = unserialize($message->getBody());
 
-        $body = $this->twig
-            ->render('@App/mails/feedback.html.twig', [
+        $body = $this->twig->render('@App/mails/feedback.html.twig', [
                 'name' => $feedback->name,
                 'email' => $feedback->email,
                 'body' => $feedback->message]);

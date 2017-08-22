@@ -32,7 +32,9 @@
         "doctrine/doctrine-migrations-bundle": "^1.0",
         "paquettg/php-html-parser": "^1.7",
         "guzzlehttp/guzzle": "^6.2",
-        "php-amqplib/rabbitmq-bundle": "^1.12"
+        "php-amqplib/rabbitmq-bundle": "^1.12",
+        "symfony/assetic-bundle": "^2.8",
+        "leafo/scssphp": "^0.6.7"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

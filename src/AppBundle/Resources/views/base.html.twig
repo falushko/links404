@@ -7,10 +7,9 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <link href="{{ asset('bundles/app/css/bootstrap.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('bundles/app/css/ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
-        <link href="{{ asset('bundles/app/css/sticky-footer-navbar.css') }}" rel="stylesheet">
-        <link href="{{ asset('bundles/app/css/styles.css') }}" rel="stylesheet">
+        {% stylesheets '@AppBundle/Resources/public/css/*' filter='cssrewrite' filter="scssphp" output='css/compiled/main.css'%}
+            <link rel="stylesheet" href="{{ asset_url }}" />
+        {% endstylesheets %}
 
         <title>{% block title %}Welcome!{% endblock %}</title>
         {% block stylesheets %}{% endblock %}
@@ -19,10 +18,11 @@
     <body>
         {% block body %}{% endblock %}
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="{{ asset('bundles/app/js/jquery.min.js') }}"></script>
-        <script src="{{ asset('bundles/app/js/bootstrap.min.js') }}"></script>
-        <script src="{{ asset('bundles/app/js/ie10-viewport-bug-workaround.js') }}"></script>
+
+        {% javascripts '@AppBundle/Resources/public/js/*' output='js/compiled/main.js'%}
+            <script src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+
 
         {% block javascripts %}{% endblock %}
     </body>
