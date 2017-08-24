@@ -25,8 +25,7 @@ class Crawler
         $pages = $this->getAllWebsitePages($website);
 
         foreach ($pages as $page) {
-
-            $dom = new Dom;
+			$dom = new Dom;
             $dom->load($page);
             $links = $dom->find('a');
 
@@ -69,31 +68,51 @@ class Crawler
         while (true) {
             if ($counter >= count($pages)) break;
 
-            try {
-                $dom = new Dom;
-                $dom->load($pages[$counter]);
-                $links = $dom->find('a');
+			$dom = new Dom;
+			$dom->load($pages[$counter]);
+			$links = $dom->find('a');
 
-                foreach ($links as $link) {
-                    $link = $link->tag->getAttribute('href')['value'];
+			foreach ($links as $link) {
+				$link = $link->tag->getAttribute('href')['value'];
+				$link = $this->trimAnchor($link);
+				$link = $this->addHostIfNeeded($link, $website);
 
-                    if ($this->isLinkOutbound($link, $website)) continue;
-                    if ($this->isLinkToMedia($link)) continue;
-                    if (in_array($link, $pages)) continue;
+				if ($this->isLinkOutbound($link, $website)) continue;
+				if ($this->isLinkToMedia($link)) continue;
+				if (in_array($link, $pages)) continue;
+				if (empty($link)) continue;
 
-                    $pages[] = $link;
-                }
+				$pages[] = $link;
+			}
 
-                $counter++;
-
-            } catch (\Exception $exception) {
-                //todo log
-            }
-
+			$counter++;
         }
+
+		dump($pages); exit();
 
         return $pages;
     }
+
+	/**
+	 * Adds host to link if it is absent
+	 * @param $link
+	 * @param $host
+	 * @return mixed
+	 */
+    public function addHostIfNeeded($link, $host)
+	{
+		return (strpos($link, $host) === false) ? rtrim($host, '/') . $link : $link;
+	}
+
+	/**
+	 * Trim anchor that goes after # symbol
+	 * @param $link
+	 * @return mixed
+	 */
+    public function trimAnchor($link)
+	{
+		return preg_match("/#(.*)$/", $link) ? explode('#', $link)[0] : $link;
+	}
 
     /**
      * Get all website pages from sitemap.xml. Only one level sitemap is allowed.

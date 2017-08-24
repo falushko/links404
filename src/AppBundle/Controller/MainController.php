@@ -32,8 +32,9 @@ class MainController extends AppController
      */
     public function resultAction()
     {
-        $links = $this->get('app.crawler')->crawl('https://website.com');
-        //todo implement
+        $links = $this->get('app.crawler')->crawl('https://ggds.ru/');
+
+        dump($links); exit();
     }
 
 	/**
