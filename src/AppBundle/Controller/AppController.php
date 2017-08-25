@@ -16,7 +16,7 @@ class AppController extends Controller
      */
     protected function save(...$entities)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->get('em');
 
         foreach ($entities as $entity) {
             $em->persist($entity);

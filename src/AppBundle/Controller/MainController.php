@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\ExceptionLog;
 use AppBundle\Entity\Feedback;
 use AppBundle\Form\FeedbackType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -25,16 +26,28 @@ class MainController extends AppController
      */
     public function aboutAction(){}
 
-    /**
-     * @Route("/result", name="result")
-     * @Method({"GET"})
-     * @Template
-     */
-    public function resultAction()
+	/**
+	 * @Route("/result", name="result")
+	 * @Method({"GET"})
+	 * @Template
+	 * @param Request $request
+	 * @return array|\Symfony\Component\HttpFoundation\Response
+	 */
+    public function resultAction(Request $request)
     {
-        $links = $this->get('app.crawler')->crawl('https://ggds.ru/');
+    	$url = $request->get('url');
 
-        dump($links); exit();
+    	try {
+			$links = $this->get('app.crawler')->crawl($url);
+		} catch (\Exception $e) {
+    		$exceptionLog = ExceptionLog::createFromException($e);
+    		$exceptionLog->url = $url;
+    		$this->save($exceptionLog);
+
+    		return $this->render('@App/main/exception.html.twig');
+		}
+
+		return ['links' => $links];
     }
 
 	/**

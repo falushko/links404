@@ -7,6 +7,7 @@ services:
 
     app.crawler:
         class: AppBundle\Services\Crawler
+        arguments: ["@em"]
 
     app.feedback.listener:
         class: AppBundle\Listener\FeedbackListener
@@ -15,3 +16,5 @@ services:
             - { name: doctrine.event_listener, event: postPersist }
 
     app.mailer.producer: '@old_sound_rabbit_mq.mail_producer'
+
+    em: '@doctrine.orm.default_entity_manager'

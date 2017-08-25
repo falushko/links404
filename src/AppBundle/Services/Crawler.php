@@ -2,6 +2,8 @@
 
 namespace AppBundle\Services;
 
+use AppBundle\Entity\ExceptionLog;
+use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client as HTTPClient;
 use PHPHtmlParser\Dom;
 use SimpleXMLElement;
@@ -13,7 +15,14 @@ use SimpleXMLElement;
  */
 class Crawler
 {
-    /**
+	private $em;
+
+	public function __construct(EntityManager $em)
+	{
+		$this->em = $em;
+	}
+
+	/**
      * Main method that makes the things done.
      * @param $website
      * @return array
@@ -31,23 +40,19 @@ class Crawler
 
             foreach ($links as $link) {
                 $link = $link->tag->getAttribute('href')['value'];
+				$link = $this->trimAnchor($link);
+				$link = $this->addHostIfNeeded($link, $website);
 
                 if ($this->isLinkToMedia($link)) {
-                    if ($this->isMediaNotExist($link)) continue;
+                    if (!$this->isMediaNotExist($link)) continue;
 
                     $brokenMediaLinks[] = ['page' => $page, 'link' => $link];
                 } else {
+					$status = $this->getHTTPResponseStatus($link);
 
-                    try {
-                        $status = $this->getHTTPResponseStatus($link);
+					if ($status['code'] === 200) continue;
 
-                        if ($status['code'] === 200) continue;
-
-                        $brokenLinksWithStatuses[] = ['page' => $page, 'link' => $link, 'status' => $status];
-
-                    } catch (\Exception $exception) {
-                        //todo log
-                    }
+					$brokenLinksWithStatuses[] = ['page' => $page, 'link' => $link, 'status' => $status];
                 }
             }
         }
@@ -88,8 +93,6 @@ class Crawler
 			$counter++;
         }
 
-		dump($pages); exit();
-
         return $pages;
     }
 
@@ -101,6 +104,8 @@ class Crawler
 	 */
     public function addHostIfNeeded($link, $host)
 	{
+		if (strpos($link, "http") === 0) return $link;
+
 		return (strpos($link, $host) === false) ? rtrim($host, '/') . $link : $link;
 	}
 
@@ -113,43 +118,6 @@ class Crawler
 	{
 		return preg_match("/#(.*)$/", $link) ? explode('#', $link)[0] : $link;
 	}
-
-    /**
-     * Get all website pages from sitemap.xml. Only one level sitemap is allowed.
-     * @param string $website
-     * @return array
-     * @throws \Exception
-     */
-    public function getAllWebsitePagesFromSitemap(string $website) : array
-    {
-        $pages = [];
-        $client = new HTTPClient();
-        $response = $client->get($website . '/sitemap.xml', ['exceptions' => false]);
-
-        //todo create custom exception and handle it
-        if ($response->getStatusCode() !== 200) throw new \Exception();
-
-        $links = new SimpleXMLElement($response->getBody());
-
-        foreach ($links as $link) $pages[] = (string) $link->loc;
-
-        return $pages;
-    }
-
-    /**
-     * Get all inbound links from page.
-     * @param string $page
-     * @param string $website
-     * @return array
-     */
-    public function getAllInboundLinksFromPage(string $page, string $website) : array
-    {
-        $result = [];
-
-        //todo implementation
-
-        return $result;
-    }
 
     /**
      * Check if link is outbound.
@@ -170,12 +138,14 @@ class Crawler
     public function getHTTPResponseStatus(string $link) : array
     {
         $client = new HTTPClient();
-        $response = $client->head($link, ['exceptions' => false]);
 
-        return [
-            'code' => $response->getStatusCode(),
-            'phrase' => $response->getReasonPhrase()
-        ];
+		try {
+			$response = $client->head($link, ['exceptions' => false]);
+
+			return ['code' => $response->getStatusCode(), 'phrase' => $response->getReasonPhrase()];
+		} catch (\Exception $e) {
+			return ['code' => 404, 'phrase' => 'Host does not exist.'];
+		}
     }
 
     /**
@@ -191,12 +161,12 @@ class Crawler
 
             try {
                 /** Check if link ends with $medias */
-                if (substr_compare($link, $media, strlen($link) - strlen($media), strlen($media)) === 0) {
-                    return true;
-                }
+                if (substr_compare($link, $media, strlen($link) - strlen($media), strlen($media)) === 0) return true;
 
-            } catch (\Exception $exception) {
-                //todo log
+            } catch (\Exception $e) {
+				$exceptionLog = ExceptionLog::createFromException($e);
+				$this->em->persist($exceptionLog);
+				$this->em->flush();
             }
         }
 
@@ -212,4 +182,41 @@ class Crawler
     {
         return $this->getHTTPResponseStatus($link)['code'] !== 200 ? true : false;
     }
+
+	/**
+	 * Get all inbound links from page.
+	 * @param string $page
+	 * @param string $website
+	 * @return array
+	 */
+	public function getAllInboundLinksFromPage(string $page, string $website) : array
+	{
+		$result = [];
+
+		//todo implementation
+
+		return $result;
+	}
+
+	/**
+	 * Get all website pages from sitemap.xml. Only one level sitemap is allowed.
+	 * @param string $website
+	 * @return array
+	 * @throws \Exception
+	 */
+	public function getAllWebsitePagesFromSitemap(string $website) : array
+	{
+		$pages = [];
+		$client = new HTTPClient();
+		$response = $client->get($website . '/sitemap.xml', ['exceptions' => false]);
+
+		//todo create custom exception and handle it
+		if ($response->getStatusCode() !== 200) throw new \Exception();
+
+		$links = new SimpleXMLElement($response->getBody());
+
+		foreach ($links as $link) $pages[] = (string) $link->loc;
+
+		return $pages;
+	}
 }
