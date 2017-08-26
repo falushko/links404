@@ -17,7 +17,11 @@ class MainController extends AppController
      * @Method({"GET"})
      * @Template
      */
-    public function indexAction(){}
+    public function indexAction()
+	{
+		//todo save links to db and redirect to result
+		//todo create cron command that deletes all old rows weekly
+	}
 
     /**
      * @Route("/about", name="about")

@@ -6,7 +6,6 @@ use AppBundle\Entity\ExceptionLog;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client as HTTPClient;
 use PHPHtmlParser\Dom;
-use SimpleXMLElement;
 
 /**
  * Moves through website, finds all pages and outbound links. Checks http response status codes.
@@ -182,41 +181,4 @@ class Crawler
     {
         return $this->getHTTPResponseStatus($link)['code'] !== 200 ? true : false;
     }
-
-	/**
-	 * Get all inbound links from page.
-	 * @param string $page
-	 * @param string $website
-	 * @return array
-	 */
-	public function getAllInboundLinksFromPage(string $page, string $website) : array
-	{
-		$result = [];
-
-		//todo implementation
-
-		return $result;
-	}
-
-	/**
-	 * Get all website pages from sitemap.xml. Only one level sitemap is allowed.
-	 * @param string $website
-	 * @return array
-	 * @throws \Exception
-	 */
-	public function getAllWebsitePagesFromSitemap(string $website) : array
-	{
-		$pages = [];
-		$client = new HTTPClient();
-		$response = $client->get($website . '/sitemap.xml', ['exceptions' => false]);
-
-		//todo create custom exception and handle it
-		if ($response->getStatusCode() !== 200) throw new \Exception();
-
-		$links = new SimpleXMLElement($response->getBody());
-
-		foreach ($links as $link) $pages[] = (string) $link->loc;
-
-		return $pages;
-	}
 }
