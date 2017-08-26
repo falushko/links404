@@ -1,0 +1,6 @@
+name_blank: Name should not be blank.
+email_blank: Email should not be blank.
+email_invalid: The email is not valid.
+message_blank: Message should not be blank.
+message_short: Message must be at least 3 characters long.
+message_long: Message cannot be longer than 2000 characters.

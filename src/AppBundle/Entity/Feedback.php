@@ -20,25 +20,25 @@ class Feedback
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Assert\NotBlank(message = "Name should not be blank.")
+     * @Assert\NotBlank(message = "name_blank")
      */
     public $name;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Assert\NotBlank(message = "Email should not be blank.")
-     * @Assert\Email(message = "The email {{ value }} is not a valid email.", groups={"default"})
+     * @Assert\NotBlank(message = "email_blank")
+     * @Assert\Email(message = "email_invalid")
      */
     public $email;
 
     /**
      * @ORM\Column(type="string", length=2000)
-     * @Assert\NotBlank(message = "Message should not be blank.")
+     * @Assert\NotBlank(message = "message_blank")
      * @Assert\Length(
      *      min = 3,
      *      max = 2000,
-     *      minMessage = "Message must be at least {{ limit }} characters long",
-     *      maxMessage = "Message cannot be longer than {{ limit }} characters",
+     *      minMessage = "message_short",
+     *      maxMessage = "message_long",
      * )
      */
     public $message;

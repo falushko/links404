@@ -18,21 +18,21 @@ class FeedbackType extends AbstractType
 				'label' => false,
 				'attr' => [
 					'class'=>'form-control',
-					'placeholder' => 'Name',
+					'placeholder' => 'name',
 				]])
 
 			->add('email', TextType::class, [
 				'label' => false,
 				'attr' => [
 					'class'=>'form-control',
-					'placeholder' => 'Email',
+					'placeholder' => 'email',
 				]])
 
 			->add('message', TextareaType::class, [
 				'label' => false,
 				'attr' => [
 					'class'=>'form-control',
-					'placeholder' => 'Message',
+					'placeholder' => 'message',
 					'rows' => 4,
 				]]);
     }
@@ -40,7 +40,9 @@ class FeedbackType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-        	'data_class' => Feedback::class
+        	'data_class' => Feedback::class,
+			'translation_domain' => 'form',
+			'attr'=>array('novalidate'=>'novalidate')
 		]);
     }
 }
