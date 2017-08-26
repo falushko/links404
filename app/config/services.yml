@@ -15,6 +15,11 @@ services:
         tags:
             - { name: doctrine.event_listener, event: postPersist }
 
-    app.mailer.producer: '@old_sound_rabbit_mq.mail_producer'
+    app.locale.listener:
+        class: AppBundle\Listener\LocaleListener
+        arguments: [ "@translator.default", "@session" ]
+        tags:
+           - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
+    app.mailer.producer: '@old_sound_rabbit_mq.mail_producer'
     em: '@doctrine.orm.default_entity_manager'

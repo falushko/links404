@@ -65,10 +65,24 @@ class MainController extends AppController
 
 		if ($form->isSubmitted() && $form->isValid()) {
 			$this->save($feedback);
-			$this->addFlash('success', 'Thank\'s for your feedback!');
+			$this->addFlash('success', 'successful_feedback');
 			return $this->redirectToRoute('contacts');
 		}
 
 		return ['form' => $form->createView()];
     }
+
+	/**
+	 * @Route("/language/{language}", name="language")
+	 * @Method({"GET"})
+	 * @param Request $request
+	 * @param $language
+	 * @return \Symfony\Component\HttpFoundation\RedirectResponse
+	 */
+	public function languageAction(Request $request, $language)
+	{
+		$this->get('session')->set('language', $language);
+
+		return $this->redirect($request->headers->get('referer'));
+	}
 }

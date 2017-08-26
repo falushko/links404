@@ -1,14 +1,10 @@
 {% extends '@App/layout.html.twig' %}
 
-{% block title %}About{% endblock %}
+{% block title %}{{ 'about'|trans }}{% endblock %}
 
 {% block content %}
     <div class="container">
-        <h1>About</h1>
-
-        <p>Here you can check your website on broken links.<br>
-            Enter your site address and getdetailed information about links that
-            has http responses different from 200.<br>
-            Broken links to media are also analysed.</p>
+        <h1>{{ 'about'|trans }}</h1>
+        <p>{{ 'about_text'|trans|raw }}</p>
     </div>
 {% endblock %}

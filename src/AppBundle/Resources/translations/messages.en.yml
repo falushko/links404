@@ -1,0 +1,12 @@
+about: About
+about_text: Here you can check your website on broken links.<br>Enter your site address and get detailed information about links that has http responses different from 200.<br>Broken links to media are also analysed.
+contacts: Contacts
+send_feedback: Please send us your feedback
+submit: Submit
+successful_feedback: Thank's for your feedback!
+something_wrong: Something went wrong
+try_again: Please try again later.
+oops: Oops...
+find_all_links: Find all 404 links on your site
+result: Result
+all_rights_reserved: © All rights reserved
