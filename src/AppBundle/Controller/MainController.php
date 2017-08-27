@@ -85,8 +85,6 @@ class MainController extends AppController
 			->getRepository('AppBundle:BrokenLink')
 			->findByHost($host);
 
-//    	dump($links); exit();
-
 		return ['links' => $links, 'host' => $host];
     }
 
