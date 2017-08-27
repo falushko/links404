@@ -6,19 +6,34 @@
     <div class="container">
         <h2>{{ host }}</h2>
 
+        {{ knp_pagination_render(pagination) }}
+
         <div class="table-responsive">
             <table class="table table-hover table-bordered">
-                <tr class="active"><th>Broken Link</th><th>Page</th><th>Status</th></tr>
+                <tr class="active">
+                    <th>{{ 'broken_link'|trans }}</th>
+                    <th>{{ 'page'|trans }}</th>
+                    <th>{{ 'status'|trans }}</th>
+                </tr>
 
-                {% for link in links['brokenLink'] %}
-                    {% include '@App/@partials/link-row.html.twig' %}
-                {% endfor %}
-
-                {% for link in links['brokenMedia'] %}
-                    {% include '@App/@partials/link-row.html.twig' %}
+                {% for link in pagination %}
+                    <tr>
+                        <td><a target="_blank" href="{{ link.link }}">{{ link.link }}</a></td>
+                        <td><a target="_blank" href="{{ link.page }}">{{ link.page }}</a></td>
+                        <td>
+                            {% if link.status|slice(0, 1) == 4 %}
+                                <button class="btn btn-warning btn-xs">{{ link.status }}</button>
+                            {% else %}
+                                <button class="btn btn-danger btn-xs">{{ link.status }}</button>
+                            {% endif %}
+                        </td>
+                    </tr>
                 {% endfor %}
 
             </table>
         </div>
+
+        {{ knp_pagination_render(pagination) }}
+
     </div>
 {% endblock %}

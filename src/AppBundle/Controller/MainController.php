@@ -80,12 +80,10 @@ class MainController extends AppController
     public function resultAction(Request $request)
     {
     	$host = $request->get('url');
+    	$query = $this->get('em')->getRepository('AppBundle:BrokenLink')->findByHost($host);
+		$pagination = $this->get('knp_paginator')->paginate($query, $request->query->getInt('page', 1), 20);
 
-    	$links = $this->get('em')
-			->getRepository('AppBundle:BrokenLink')
-			->findByHost($host);
-
-		return ['links' => $links, 'host' => $host];
+		return ['pagination' => $pagination, 'host' => $host];
     }
 
 	/**

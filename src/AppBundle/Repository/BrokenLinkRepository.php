@@ -8,24 +8,12 @@ class BrokenLinkRepository extends EntityRepository
 {
 	public function findByHost($host)
 	{
-		$brokenLink = $this->createQueryBuilder('bl')
+		return $this->createQueryBuilder('bl')
 			->select('bl')
 			->where('bl.host = :host')
-			->andWhere('bl.isMedia = false')
 			->setParameter('host', $host)
+			->orderBy('bl.isMedia', 'DESC')
 			->orderBy('bl.status')
-			->getQuery()
-			->getResult();
-
-		$brokenMedia = $this->createQueryBuilder('bl')
-			->select('bl')
-			->where('bl.host = :host')
-			->andWhere('bl.isMedia = true')
-			->setParameter('host', $host)
-			->orderBy('bl.status')
-			->getQuery()
-			->getResult();
-
-		return ['brokenLink' => $brokenLink, 'brokenMedia' => $brokenMedia];
+			->getQuery();
 	}
 }

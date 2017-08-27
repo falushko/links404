@@ -34,7 +34,8 @@
         "guzzlehttp/guzzle": "^6.2",
         "php-amqplib/rabbitmq-bundle": "^1.12",
         "symfony/assetic-bundle": "^2.8",
-        "leafo/scssphp": "^0.6.7"
+        "leafo/scssphp": "^0.6.7",
+        "knplabs/knp-paginator-bundle": "^2.6"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",
