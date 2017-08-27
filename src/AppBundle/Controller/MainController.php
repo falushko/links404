@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\BrokenLink;
 use AppBundle\Entity\ExceptionLog;
 use AppBundle\Entity\Feedback;
 use AppBundle\Form\FeedbackType;
@@ -12,15 +13,54 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 class MainController extends AppController
 {
-    /**
-     * @Route("/", name="homepage")
-     * @Method({"GET"})
-     * @Template
-     */
-    public function indexAction()
+	/**
+	 * @Route("/", name="homepage")
+	 * @Method({"GET", "POST"})
+	 * @Template
+	 * @param Request $request
+	 * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|void
+	 */
+    public function indexAction(Request $request)
 	{
-		//todo save links to db and redirect to result
-		//todo create cron command that deletes all old rows weekly
+		if ($request->getMethod() == 'GET') return;
+
+		$url = $request->get('url');
+
+		try {
+			$links = $this->get('app.crawler')->crawl($url);
+		} catch (\Exception $e) {
+			$exceptionLog = ExceptionLog::createFromException($e);
+			$exceptionLog->url = $url;
+			$this->save($exceptionLog);
+
+			return $this->render('@App/main/exception.html.twig');
+		}
+
+		foreach ($links['brokenLinks'] as $link) {
+			$brokenLink = new BrokenLink();
+			$brokenLink->host = $url;
+			$brokenLink->link = $link['link'];
+			$brokenLink->page = $link['page'];
+			$brokenLink->status = $link['status'];
+			$brokenLink->isMedia = false;
+
+			$this->get('em')->persist($brokenLink);
+		}
+
+		foreach ($links['brokenMedia'] as $link) {
+			$brokenLink = new BrokenLink();
+			$brokenLink->host = $url;
+			$brokenLink->link = $link['link'];
+			$brokenLink->page = $link['page'];
+			$brokenLink->status = $link['status'];
+			$brokenLink->isMedia = true;
+
+			$this->get('em')->persist($brokenLink);
+		}
+
+		$this->get('em')->flush();
+
+		return $this->redirectToRoute('result', ['url' => $url]);
 	}
 
     /**
@@ -39,19 +79,15 @@ class MainController extends AppController
 	 */
     public function resultAction(Request $request)
     {
-    	$url = $request->get('url');
+    	$host = $request->get('url');
 
-    	try {
-			$links = $this->get('app.crawler')->crawl($url);
-		} catch (\Exception $e) {
-    		$exceptionLog = ExceptionLog::createFromException($e);
-    		$exceptionLog->url = $url;
-    		$this->save($exceptionLog);
+    	$links = $this->get('em')
+			->getRepository('AppBundle:BrokenLink')
+			->findByHost($host);
 
-    		return $this->render('@App/main/exception.html.twig');
-		}
+//    	dump($links); exit();
 
-		return ['links' => $links];
+		return ['links' => $links, 'host' => $host];
     }
 
 	/**

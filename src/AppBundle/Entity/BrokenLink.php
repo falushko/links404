@@ -1,15 +1,54 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vladimir
- * Date: 26.08.17
- * Time: 22:44
- */
 
 namespace AppBundle\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @ORM\Table(name="broken_links")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\BrokenLinkRepository")
+ */
 class BrokenLink
 {
+	/**
+	 * @ORM\Id
+	 * @ORM\Column(type="integer")
+	 * @ORM\GeneratedValue(strategy="AUTO")
+	 */
+	public $id;
 
+	/**
+	 * @ORM\Column(type="string")
+	 */
+	public $host;
+
+	/**
+	 * @ORM\Column(type="string")
+	 */
+	public $page;
+
+	/**
+	 * @ORM\Column(type="string")
+	 */
+	public $link;
+
+	/**
+	 * @ORM\Column(type="integer")
+	 */
+	public $status;
+
+	/**
+	 * @ORM\Column(type="datetime")
+	 */
+	public $createdAt;
+
+	/**
+	 * @ORM\Column(type="boolean")
+	 */
+	public $isMedia;
+
+	public function __construct()
+	{
+		$this->createdAt = new \DateTime();
+	}
 }

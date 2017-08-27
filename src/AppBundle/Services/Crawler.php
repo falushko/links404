@@ -42,16 +42,17 @@ class Crawler
 				$link = $this->trimAnchor($link);
 				$link = $this->addHostIfNeeded($link, $website);
 
+				// todo simplify
                 if ($this->isLinkToMedia($link)) {
                     if (!$this->isMediaNotExist($link)) continue;
 
-                    $brokenMediaLinks[] = ['page' => $page, 'link' => $link];
+                    $brokenMediaLinks[] = ['page' => $page, 'link' => $link, 'status' => 404];
                 } else {
 					$status = $this->getHTTPResponseStatus($link);
 
 					if ($status['code'] === 200) continue;
 
-					$brokenLinksWithStatuses[] = ['page' => $page, 'link' => $link, 'status' => $status];
+					$brokenLinksWithStatuses[] = ['page' => $page, 'link' => $link, 'status' => $status['code']];
                 }
             }
         }
