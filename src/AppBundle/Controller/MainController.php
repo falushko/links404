@@ -2,7 +2,6 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\BrokenLink;
 use AppBundle\Entity\ExceptionLog;
 use AppBundle\Entity\Feedback;
 use AppBundle\Form\FeedbackType;
@@ -27,7 +26,7 @@ class MainController extends AppController
 		$url = $request->get('url');
 
 		try {
-			$links = $this->get('app.crawler')->crawl($url);
+			$this->get('app.crawler')->crawl($url);
 		} catch (\Exception $e) {
 			$exceptionLog = ExceptionLog::createFromException($e);
 			$exceptionLog->url = $url;
@@ -35,30 +34,6 @@ class MainController extends AppController
 
 			return $this->render('@App/main/exception.html.twig');
 		}
-
-		foreach ($links['brokenLinks'] as $link) {
-			$brokenLink = new BrokenLink();
-			$brokenLink->host = $url;
-			$brokenLink->link = $link['link'];
-			$brokenLink->page = $link['page'];
-			$brokenLink->status = $link['status'];
-			$brokenLink->isMedia = false;
-
-			$this->get('em')->persist($brokenLink);
-		}
-
-		foreach ($links['brokenMedia'] as $link) {
-			$brokenLink = new BrokenLink();
-			$brokenLink->host = $url;
-			$brokenLink->link = $link['link'];
-			$brokenLink->page = $link['page'];
-			$brokenLink->status = $link['status'];
-			$brokenLink->isMedia = true;
-
-			$this->get('em')->persist($brokenLink);
-		}
-
-		$this->get('em')->flush();
 
 		return $this->redirectToRoute('result', ['url' => $url]);
 	}
@@ -80,7 +55,7 @@ class MainController extends AppController
     public function resultAction(Request $request)
     {
     	$host = $request->get('url');
-    	$query = $this->get('em')->getRepository('AppBundle:BrokenLink')->findByHost($host);
+    	$query = $this->getDoctrine()->getRepository('AppBundle:BrokenLink')->findByHost($host);
 		$pagination = $this->get('knp_paginator')->paginate($query, $request->query->getInt('page', 1), 20);
 
 		return ['pagination' => $pagination, 'host' => $host];

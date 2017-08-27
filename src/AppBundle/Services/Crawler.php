@@ -2,6 +2,7 @@
 
 namespace AppBundle\Services;
 
+use AppBundle\Entity\BrokenLink;
 use AppBundle\Entity\ExceptionLog;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client as HTTPClient;
@@ -28,8 +29,8 @@ class Crawler
      */
     public function crawl(string $website) : array
     {
-        $brokenMediaLinks = [];
-        $brokenLinksWithStatuses = [];
+        $brokenMedia = [];
+        $brokenLinks = [];
         $pages = $this->getAllWebsitePages($website);
 
         foreach ($pages as $page) {
@@ -46,18 +47,20 @@ class Crawler
                 if ($this->isLinkToMedia($link)) {
                     if (!$this->isMediaNotExist($link)) continue;
 
-                    $brokenMediaLinks[] = ['page' => $page, 'link' => $link, 'status' => 404];
+                    $brokenMedia[] = ['page' => $page, 'link' => $link, 'status' => 404];
                 } else {
 					$status = $this->getHTTPResponseStatus($link);
 
 					if ($status['code'] === 200) continue;
 
-					$brokenLinksWithStatuses[] = ['page' => $page, 'link' => $link, 'status' => $status['code']];
+					$brokenLinks[] = ['page' => $page, 'link' => $link, 'status' => $status['code']];
                 }
             }
         }
 
-        return ['brokenLinks' => $brokenLinksWithStatuses, 'brokenMedia' => $brokenMediaLinks];
+        $this->addBrokenLinksToDb($website, $brokenLinks, $brokenMedia);
+
+        return ['brokenLinks' => $brokenLinks, 'brokenMedia' => $brokenMedia];
     }
 
     /**
@@ -95,6 +98,46 @@ class Crawler
 
         return $pages;
     }
+
+	/**
+	 * Adds broken links to db, previously deletes all links for domain.
+	 * @param $host
+	 * @param $brokenLinks
+	 * @param $brokenMedia
+	 */
+    private function addBrokenLinksToDb($host, $brokenLinks, $brokenMedia)
+	{
+		$this->em->createQueryBuilder()
+			->delete('AppBundle:BrokenLink', 'bl')
+			->where('bl.host = :host')
+			->setParameter('host', $host)
+			->getQuery()
+			->execute();
+
+		foreach ($brokenLinks as $link) {
+			$brokenLink = new BrokenLink();
+			$brokenLink->host = $host;
+			$brokenLink->link = $link['link'];
+			$brokenLink->page = $link['page'];
+			$brokenLink->status = $link['status'];
+			$brokenLink->isMedia = false;
+
+			$this->em->persist($brokenLink);
+		}
+
+		foreach ($brokenMedia as $link) {
+			$brokenLink = new BrokenLink();
+			$brokenLink->host = $host;
+			$brokenLink->link = $link['link'];
+			$brokenLink->page = $link['page'];
+			$brokenLink->status = $link['status'];
+			$brokenLink->isMedia = true;
+
+			$this->em->persist($brokenLink);
+		}
+
+		$this->em->flush();
+	}
 
 	/**
 	 * Adds host to link if it is absent
