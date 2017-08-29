@@ -7,6 +7,7 @@ use AppBundle\Entity\ExceptionLog;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client as HTTPClient;
 use PHPHtmlParser\Dom;
+use Symfony\Component\Debug\Exception\FatalErrorException;
 
 /**
  * Moves through website, finds all pages and outbound links. Checks http response status codes.
@@ -16,6 +17,13 @@ use PHPHtmlParser\Dom;
 class Crawler
 {
 	private $em;
+	private $ignoredLinks = [
+		'https://t.me/',
+		'https://telegram.me/',
+		'http://vk.com/share.php',
+		'whatsapp://',
+		'mailto:'
+	];
 
 	public function __construct(EntityManager $em)
 	{
@@ -42,6 +50,8 @@ class Crawler
                 $link = $link->tag->getAttribute('href')['value'];
 				$link = $this->trimAnchor($link);
 				$link = $this->addHostIfNeeded($link, $website);
+
+				if ($this->isLinkIgnored($link)) continue;
 
 				// todo simplify
                 if ($this->isLinkToMedia($link)) {
@@ -84,7 +94,9 @@ class Crawler
 				$link = $link->tag->getAttribute('href')['value'];
 				$link = $this->trimAnchor($link);
 				$link = $this->addHostIfNeeded($link, $website);
+				$link = $this->trimReplyToComment($link);
 
+				if ($this->isLinkIgnored($link)) continue;
 				if ($this->isLinkOutbound($link, $website)) continue;
 				if ($this->isLinkToMedia($link)) continue;
 				if (in_array($link, $pages)) continue;
@@ -153,6 +165,34 @@ class Crawler
 	}
 
 	/**
+	 * Checks if link is ignored
+	 * @param $link
+	 * @return bool
+	 */
+	private function isLinkIgnored($link)
+	{
+		foreach ($this->ignoredLinks as $ignoredLink) {
+			if (strpos($link, $ignoredLink) === 0) return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Trims replytocom query param
+	 * @param $link
+	 * @return mixed
+	 */
+	private function trimReplyToComment($link)
+	{
+		$explodedLink = explode('?', $link);
+
+		return isset($explodedLink[1]) && strpos($explodedLink[1], 'replytocom') === 0
+			? $explodedLink[0]
+			: $link;
+	}
+
+	/**
 	 * Trim anchor that goes after # symbol
 	 * @param $link
 	 * @return mixed
@@ -170,7 +210,7 @@ class Crawler
      */
     public function isLinkOutbound(string $link, string $website) : bool
     {
-        return strpos($link, $website) !== false || strpos($link, "http") !== 0 ? false : true;
+        return !(strpos($link, $website) === 0);
     }
 
     /**
