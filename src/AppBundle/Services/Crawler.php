@@ -7,7 +7,6 @@ use AppBundle\Entity\ExceptionLog;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client as HTTPClient;
 use PHPHtmlParser\Dom;
-use Symfony\Component\Debug\Exception\FatalErrorException;
 
 /**
  * Moves through website, finds all pages and outbound links. Checks http response status codes.
@@ -37,6 +36,7 @@ class Crawler
      */
     public function crawl(string $website) : array
     {
+		set_time_limit(0);
         $brokenMedia = [];
         $brokenLinks = [];
         $pages = $this->getAllWebsitePages($website);
