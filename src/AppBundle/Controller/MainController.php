@@ -56,8 +56,8 @@ class MainController extends AppController
     {
     	$host = $request->get('url');
     	$statistic = $this->getDoctrine()->getRepository('AppBundle:Statistic')->findOneBy(['website' => $host]);
-    	$query = $this->getDoctrine()->getRepository('AppBundle:BrokenLink')->findByHost($host);
-		$pagination = $this->get('knp_paginator')->paginate($query, $request->query->getInt('page', 1), 20);
+    	$brokenLinkQuery = $this->getDoctrine()->getRepository('AppBundle:BrokenLink')->findByHost($host);
+		$pagination = $this->get('knp_paginator')->paginate($brokenLinkQuery, $request->query->getInt('page', 1), 20);
 
 		return ['pagination' => $pagination, 'host' => $host, 'statistic' => $statistic];
     }
@@ -83,6 +83,25 @@ class MainController extends AppController
 
 		return ['form' => $form->createView()];
     }
+
+	/**
+	 * @Route("/news", name="news")
+	 * @Method({"GET"})
+	 * @Template
+	 * @param Request $request
+	 * @return array
+	 */
+    public function newsAction(Request $request)
+	{
+		$newsQuery = $this->getDoctrine()
+			->getRepository('AppBundle:News')
+			->getAllQuery($this->get('session')->get('language'));
+
+		$pagination = $this->get('knp_paginator')
+			->paginate($newsQuery, $request->query->getInt('page', 1), 20);
+
+		return ['pagination' => $pagination];
+	}
 
 	/**
 	 * @Route("/language/{language}", name="language")

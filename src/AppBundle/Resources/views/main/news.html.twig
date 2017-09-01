@@ -1,0 +1,21 @@
+{% extends '@App/layout.html.twig' %}
+
+{% block title %}{{ 'news'|trans }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>{{ 'news'|trans }}</h2>
+        <hr>
+
+            {% for article in pagination %}
+                <h4>{{ article.title }}</h4>
+                <p>{{ article.createdAt | date('d-m-Y H:i') }}</p>
+                <p>{{ article.body }}</p>
+                <hr>
+
+            {% endfor %}
+
+        {{ knp_pagination_render(pagination) }}
+
+    </div>
+{% endblock %}
