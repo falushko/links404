@@ -2,10 +2,17 @@
 
 namespace AppBundle\Services;
 
+use AppBundle\Entity\ExceptionLog;
+use AppBundle\Entity\Feedback;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Swift_Message;
 
+/**
+ * It is mailer consumer. To start consume message run: bin/console rabbitmq:consumer mail &
+ * Class Mailer
+ * @package AppBundle\Services
+ */
 class Mailer implements ConsumerInterface
 {
     private $twig;
@@ -20,18 +27,40 @@ class Mailer implements ConsumerInterface
 
     public function execute(AMQPMessage $message)
     {
-        $feedback = unserialize($message->getBody());
+        $message = unserialize($message->getBody());
 
-        $body = $this->twig->render('@App/mails/feedback.html.twig', [
-                'name' => $feedback->name,
-                'email' => $feedback->email,
-                'body' => $feedback->message]);
-
-        $this->mailer->send(Swift_Message::newInstance()
-            ->setSubject('404links feedback')
-            ->setFrom($feedback->email)
-            ->setTo(self::FEEDBACKS_EMAIL)
-            ->setBody($body, 'text/html')
-        );
+		if ($message instanceof Feedback) {
+			$this->sendFeedbackMessage($message);
+		} elseif ($message instanceof ExceptionLog) {
+			$this->sendExceptionLogMessage($message);
+		}
     }
+
+    private function sendFeedbackMessage(Feedback $feedback)
+	{
+		$body = $this->twig->render('@App/mails/feedback.html.twig', [
+			'name' => $feedback->name,
+			'email' => $feedback->email,
+			'body' => $feedback->message]);
+
+		$this->mailer->send(Swift_Message::newInstance()
+			->setSubject('404links feedback')
+			->setFrom($feedback->email)
+			->setTo(self::FEEDBACKS_EMAIL)
+			->setBody($body, 'text/html'));
+	}
+
+	private function sendExceptionLogMessage(ExceptionLog $exceptionLog)
+	{
+		$body = $this->twig->render('@App/mails/exceptionLog.html.twig', [
+			'message' => $exceptionLog->message,
+			'url' => $exceptionLog->url,
+			'stackTrace' => $exceptionLog->stackTrace]);
+
+		$this->mailer->send(Swift_Message::newInstance()
+			->setSubject('Exception')
+			->setFrom(self::FEEDBACKS_EMAIL)
+			->setTo(self::FEEDBACKS_EMAIL)
+			->setBody($body, 'text/html'));
+	}
 }

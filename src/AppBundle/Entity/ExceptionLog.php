@@ -18,11 +18,6 @@ class ExceptionLog
 	public $id;
 
 	/**
-	 * @ORM\Column(type="integer")
-	 */
-	public $code;
-
-	/**
 	 * @ORM\Column(type="string")
 	 */
 	public $message;
@@ -50,7 +45,6 @@ class ExceptionLog
 	public static function createFromException(\Exception $e)
 	{
 		$exceptionLog = new ExceptionLog();
-		$exceptionLog->code = $e->getCode();
 		$exceptionLog->message = $e->getMessage();
 		$exceptionLog->stackTrace = $e->getTraceAsString();
 

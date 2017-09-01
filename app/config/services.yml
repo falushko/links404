@@ -15,6 +15,12 @@ services:
         tags:
             - { name: doctrine.event_listener, event: postPersist }
 
+    app.exception_log.listener:
+        class: AppBundle\Listener\ExceptionLogListener
+        arguments: ["@app.mailer.producer"]
+        tags:
+            - { name: doctrine.event_listener, event: postPersist }
+
     app.locale.listener:
         class: AppBundle\Listener\LocaleListener
         arguments: [ "@translator.default", "@session" ]
