@@ -5,6 +5,8 @@
 {% block content %}
     <div class="container">
         <h2>{{ host }}</h2>
+        <p>{{ 'pages_analysed'|trans }}: {{ statistic.pagesAmount }}<br>
+            {{ 'analysis_time'|trans }}: {{ statistic.analysisTimeFormatted }}</p>
 
         {{ knp_pagination_render(pagination) }}
 

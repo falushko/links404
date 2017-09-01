@@ -36,6 +36,8 @@ class Crawler
      */
     public function crawl(string $website) : array
     {
+		$start = time();
+
 		set_time_limit(0);
         $brokenMedia = [];
         $brokenLinks = [];
@@ -69,6 +71,9 @@ class Crawler
         }
 
         $this->addBrokenLinksToDb($website, $brokenLinks, $brokenMedia);
+
+		$end = time();
+		$this->saveStatistic($website, count($pages), $end - $start);
 
         return ['brokenLinks' => $brokenLinks, 'brokenMedia' => $brokenMedia];
     }
@@ -149,6 +154,15 @@ class Crawler
 		}
 
 		$this->em->flush();
+	}
+
+	public function saveStatistic($website, $pagesAmount, $executionTime)
+	{
+		$statistic = $this->em->getRepository('AppBundle:Statistic')->findOneByWebsiteOrCreateNew($website);
+		$statistic->pagesAmount = $pagesAmount;
+		$statistic->analysisTime = $executionTime;
+		$this->em->persist($statistic);
+		$this->em->flush($statistic);
 	}
 
 	/**

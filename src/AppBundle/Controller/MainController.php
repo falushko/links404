@@ -55,10 +55,11 @@ class MainController extends AppController
     public function resultAction(Request $request)
     {
     	$host = $request->get('url');
+    	$statistic = $this->getDoctrine()->getRepository('AppBundle:Statistic')->findOneBy(['website' => $host]);
     	$query = $this->getDoctrine()->getRepository('AppBundle:BrokenLink')->findByHost($host);
 		$pagination = $this->get('knp_paginator')->paginate($query, $request->query->getInt('page', 1), 20);
 
-		return ['pagination' => $pagination, 'host' => $host];
+		return ['pagination' => $pagination, 'host' => $host, 'statistic' => $statistic];
     }
 
 	/**
