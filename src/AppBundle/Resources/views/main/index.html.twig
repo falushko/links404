@@ -4,18 +4,20 @@
 
 {% block content %}
     <div class="container">
-        <div class="col-md-10 col-md-offset-1 wrapper top-margined">
+        <div class="col-md-10 col-md-offset-1 wrapper top-margined" id="website-submit-form-container">
             <h1 class="col-md-6 col-md-offset-2 bottom-margined">{{ 'find_all_links'|trans }}</h1>
-            <form method="post" action="{{ path('homepage') }}">
+            <form id="website-submit-form" method="post" action="{{ path('homepage') }}">
                 <div class="col-md-8">
                     <div class="form-group">
                         <input class="form-control" id="url" name="url" placeholder="{{ 'enter_website'|trans([], 'form') }}">
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary submit">{{ 'submit'|trans }}</button>
+                    <button id="website-submit-form-button" type="submit" class="btn btn-primary submit">{{ 'submit'|trans }}</button>
                 </div>
             </form>
         </div>
+
+        {% include '@App/@partials/spinner.html.twig' %}
     </div>
 {% endblock %}

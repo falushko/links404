@@ -6,6 +6,7 @@ use AppBundle\Entity\ExceptionLog;
 use AppBundle\Entity\Feedback;
 use AppBundle\Form\FeedbackType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -17,7 +18,7 @@ class MainController extends AppController
 	 * @Method({"GET", "POST"})
 	 * @Template
 	 * @param Request $request
-	 * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|void
+	 * @return string
 	 */
     public function indexAction(Request $request)
 	{
@@ -35,7 +36,7 @@ class MainController extends AppController
 			return $this->render('@App/main/exception.html.twig');
 		}
 
-		return $this->redirectToRoute('result', ['url' => $url]);
+		return new JsonResponse($this->generateUrl('result', ['url' => $url]));
 	}
 
     /**
