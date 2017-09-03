@@ -3,6 +3,7 @@ imports:
     - { resource: security.yml }
     - { resource: services.yml }
     - { resource: rabbit_mq.yml }
+    - { resource: easy_admin.yml }
 
 parameters:
     locale: en

@@ -117,4 +117,21 @@ class MainController extends AppController
 
 		return $this->redirect($request->headers->get('referer'));
 	}
+
+	/**
+	 * @Route("/login", name="login")
+	 * @Template()
+	 * @Method({"GET", "POST"})
+	 * @return array
+	 */
+	public function loginAction() {
+		$authenticationUtils = $this->get('security.authentication_utils');
+		$error = $authenticationUtils->getLastAuthenticationError();
+		$lastUsername = $authenticationUtils->getLastUsername();
+
+		return [
+			'last_username' => $lastUsername,
+			'error'  => $error,
+		];
+	}
 }

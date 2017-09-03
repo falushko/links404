@@ -1,0 +1,52 @@
+easy_admin:
+    site_name: 404 Links
+    design:
+        color_scheme: 'light'
+        menu:
+            - { entity: 'BrokenLink', icon: 'list' }
+            - { entity: 'ExceptionLog', icon: 'exclamation-triangle' }
+            - { entity: 'Feedback', icon: 'inbox' }
+            - { entity: 'News', icon: 'file-text-o' }
+            - { entity: 'Statistic', icon: 'line-chart' }
+    list:
+        title: '%%entity_label%%'
+
+    entities:
+        BrokenLink:
+            class: AppBundle\Entity\BrokenLink
+            label: 'Broken Links'
+            disabled_actions: ['new', 'edit', 'delete']
+            list:
+                fields:
+                    - id
+                    - { property: 'host', type: 'url' }
+                    - { property: 'page', type: 'url' }
+                    - { property: 'link', type: 'url' }
+                    - { property: 'isMedia', type: 'boolean' }
+                    - status
+
+        Statistic:
+            class: AppBundle\Entity\Statistic
+            label: 'Statistic'
+            disabled_actions: ['new', 'edit', 'delete']
+            list:
+                fields:
+                    - id
+                    - { property: 'website', type: 'url' }
+                    - pagesAmount
+                    - { property: 'analysisTimeFormatted', label: 'Analysis time' }
+                    - createdAt
+
+        ExceptionLog:
+            class: AppBundle\Entity\ExceptionLog
+            disabled_actions: ['new', 'edit', 'delete']
+            label: 'Exception Logs'
+
+        Feedback:
+            class: AppBundle\Entity\Feedback
+            disabled_actions: ['new', 'edit', 'delete']
+            label: 'Feedbacks'
+
+        News:
+            class: AppBundle\Entity\News
+            label: 'News'
