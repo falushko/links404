@@ -7,7 +7,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        {% stylesheets '@AppBundle/Resources/public/css/*' filter='cssrewrite' filter="scssphp" output='css/compiled/main.css'%}
+        {% stylesheets '@AppBundle/Resources/public/css/*' filter='cssrewrite' output='css/compiled/main.css'%}
             <link rel="stylesheet" href="{{ asset_url }}" />
         {% endstylesheets %}
 
@@ -18,11 +18,9 @@
     <body>
         {% block body %}{% endblock %}
 
-
         {% javascripts '@AppBundle/Resources/public/js/*' output='js/compiled/main.js'%}
             <script src="{{ asset_url }}"></script>
         {% endjavascripts %}
-
 
         {% block javascripts %}{% endblock %}
     </body>

@@ -16,6 +16,7 @@ use PHPHtmlParser\Dom;
 class Crawler
 {
 	private $em;
+	private $progress;
 	private $ignoredLinks = [
 		'https://t.me/',
 		'https://telegram.me/',
@@ -24,26 +25,31 @@ class Crawler
 		'mailto:'
 	];
 
-	public function __construct(EntityManager $em)
+	public function __construct(EntityManager $em, AnalysisProgress $progress)
 	{
 		$this->em = $em;
+		$this->progress = $progress;
 	}
 
 	/**
-     * Main method that makes the things done.
-     * @param $website
-     * @return array
-     */
-    public function crawl(string $website) : array
+	 * Main method that makes the things done.
+	 * @param string $website
+	 * @param $user
+	 * @return array
+	 */
+    public function crawl(string $website, $user) : array
     {
 		$start = time();
 
 		set_time_limit(0);
+		$this->progress->updateProgress($website, $user, 0, 1);
         $brokenMedia = [];
         $brokenLinks = [];
         $pages = $this->getAllWebsitePages($website);
+		$currentPageNumber = 0;
 
         foreach ($pages as $page) {
+        	$this->progress->updateProgress($website, $user, $currentPageNumber, count($pages));
 			$dom = new Dom;
             $dom->load($page);
             $links = $dom->find('a');
@@ -68,12 +74,15 @@ class Crawler
 					$brokenLinks[] = ['page' => $page, 'link' => $link, 'status' => $status['code']];
                 }
             }
+
+            $currentPageNumber++;
         }
 
         $this->addBrokenLinksToDb($website, $brokenLinks, $brokenMedia);
 
 		$end = time();
 		$this->saveStatistic($website, count($pages), $end - $start);
+		$this->progress->updateProgress($website, $user, $currentPageNumber, count($pages));
 
         return ['brokenLinks' => $brokenLinks, 'brokenMedia' => $brokenMedia];
     }

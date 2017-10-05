@@ -2,16 +2,17 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\ExceptionLog;
 use AppBundle\Entity\Feedback;
 use AppBundle\Form\FeedbackType;
+use AppBundle\Services\AnalysisProgress;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
-class MainController extends AppController
+class MainController extends Controller
 {
 	/**
 	 * @Route("/", name="homepage")
@@ -24,19 +25,12 @@ class MainController extends AppController
 	{
 		if ($request->getMethod() == 'GET') return;
 
-		$url = $request->get('url');
+		$this->get('app.crawler.producer')->publish(serialize([
+			'url' => $request->get('url'),
+			'user' =>  $this->get('session')->get('user')
+		]));
 
-		try {
-			$this->get('app.crawler')->crawl($url);
-		} catch (\Exception $e) {
-			$exceptionLog = ExceptionLog::createFromException($e);
-			$exceptionLog->url = $url;
-			$this->save($exceptionLog);
-
-			return $this->render('@App/main/exception.html.twig');
-		}
-
-		return new JsonResponse($this->generateUrl('result', ['url' => $url]));
+		return new JsonResponse();
 	}
 
     /**
@@ -77,7 +71,10 @@ class MainController extends AppController
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()) {
-			$this->save($feedback);
+			$this->get('em')->persist($feedback);
+			$this->get('em')->flush();
+
+			$this->get('app.mailer.producer')->publish(serialize($feedback));
 			$this->addFlash('success', 'successful_feedback');
 			return $this->redirectToRoute('contacts');
 		}
@@ -96,12 +93,37 @@ class MainController extends AppController
 	{
 		$newsQuery = $this->getDoctrine()
 			->getRepository('AppBundle:News')
-			->getAllQuery($this->get('session')->get('language'));
+			->getAllQuery($this->get('session')->get('language', 'en'));
 
 		$pagination = $this->get('knp_paginator')
 			->paginate($newsQuery, $request->query->getInt('page', 1), 20);
 
 		return ['pagination' => $pagination];
+	}
+
+	/**
+	 * @Route("/progress", name="progress")
+	 * @Method({"GET"})
+	 * @param Request $request
+	 * @return JsonResponse
+	 */
+	public function getProgressAction(Request $request)
+	{
+		$progress = $this->get('app.analysis_progress')->getProgress($request->get('url'));
+
+		if ($progress == 0) {
+			$result = ['progress' => AnalysisProgress::STARTED];
+		} elseif ($progress == 100) {
+			$result = [
+				'url' => $this->generateUrl('result', ['url' => $request->get('url')]),
+				'progress' => AnalysisProgress::FINISHED];
+		} else {
+			$result = [
+				'progressPercentage' => $progress,
+				'progress' => AnalysisProgress::IN_PROGRESS];
+		}
+
+		return new JsonResponse($result);
 	}
 
 	/**
@@ -124,14 +146,11 @@ class MainController extends AppController
 	 * @Method({"GET", "POST"})
 	 * @return array
 	 */
-	public function loginAction() {
-		$authenticationUtils = $this->get('security.authentication_utils');
-		$error = $authenticationUtils->getLastAuthenticationError();
-		$lastUsername = $authenticationUtils->getLastUsername();
-
+	public function loginAction()
+	{
 		return [
-			'last_username' => $lastUsername,
-			'error'  => $error,
+			'last_username' => $this->get('security.authentication_utils')->getLastUsername(),
+			'error'  => $this->get('security.authentication_utils')->getLastAuthenticationError()
 		];
 	}
 }

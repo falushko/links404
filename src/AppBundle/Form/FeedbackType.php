@@ -42,7 +42,7 @@ class FeedbackType extends AbstractType
         $resolver->setDefaults([
         	'data_class' => Feedback::class,
 			'translation_domain' => 'form',
-			'attr'=>array('novalidate'=>'novalidate')
+//			'attr' => ['novalidate'=>'novalidate']
 		]);
     }
 }

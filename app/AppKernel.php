@@ -21,6 +21,7 @@ class AppKernel extends Kernel
 			new Symfony\Bundle\AsseticBundle\AsseticBundle(),
 			new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
 			new JavierEguiluz\Bundle\EasyAdminBundle\EasyAdminBundle(),
+			new Snc\RedisBundle\SncRedisBundle()
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {
