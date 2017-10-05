@@ -46,8 +46,8 @@ class AnalysisProgress
 	public function getProgress($url)
 	{
 		$user = $this->session->get('user');
-		$current = $this->redis->hget($user.'|'.$url, 'current');
-		$count = $this->redis->hget($user.'|'.$url, 'count');
+		$current = $this->redis->hget($user.'|'.$url, 'current') ?? 0;
+		$count = $this->redis->hget($user.'|'.$url, 'count') ?? 1;
 		$result = round($current / $count * 100);
 
 		if ($result == 100) {
