@@ -22,7 +22,8 @@ class Crawler
 		'https://telegram.me/',
 		'http://vk.com/share.php',
 		'whatsapp://',
-		'mailto:'
+		'mailto:',
+		'javascript'
 	];
 
 	public function __construct(EntityManager $em, AnalysisProgress $progress)
@@ -106,11 +107,15 @@ class Crawler
 
 			foreach ($links as $link) {
 				$link = $link->tag->getAttribute('href')['value'];
+//
+//				dump($link);
+
+				if ($this->isLinkIgnored($link)) continue;
+
 				$link = $this->trimAnchor($link);
 				$link = $this->addHostIfNeeded($link, $website);
 				$link = $this->trimReplyToComment($link);
 
-				if ($this->isLinkIgnored($link)) continue;
 				if ($this->isLinkOutbound($link, $website)) continue;
 				if ($this->isLinkToMedia($link)) continue;
 				if (in_array($link, $pages)) continue;
