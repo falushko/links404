@@ -29,7 +29,7 @@ class Crawler
 	public function __construct(EntityManager $em, AnalysisProgress $progress)
 	{
 		$this->em = $em;
-		$this->progress = $progress;
+		$this->progress = $em->getRepository('AppBundle:Progress');
 	}
 
 	/**
@@ -43,14 +43,14 @@ class Crawler
 		$start = time();
 
 		set_time_limit(0);
-		$this->progress->updateProgress($website, $user, 0, 1);
-        $brokenMedia = [];
+		$this->progress->updateProgress($user, $website, 0, 1);
         $brokenLinks = [];
+        $checkedLinks = [];
         $pages = $this->getAllWebsitePages($website);
 		$currentPageNumber = 0;
 
         foreach ($pages as $page) {
-        	$this->progress->updateProgress($website, $user, $currentPageNumber, count($pages));
+        	$this->progress->updateProgress($user, $website, $currentPageNumber, count($pages));
 			$dom = new Dom;
             $dom->load($page);
             $links = $dom->find('a');
@@ -61,31 +61,37 @@ class Crawler
 				$link = $this->addHostIfNeeded($link, $website);
 
 				if ($this->isLinkIgnored($link)) continue;
+				if (in_array($link, $checkedLinks)) continue;
 
-				// todo simplify
-                if ($this->isLinkToMedia($link)) {
-                    if (!$this->isMediaNotExist($link)) continue;
+				foreach ($brokenLinks as $brokenLink) {
+					if ($brokenLink['link'] == $link && $brokenLink['page'] == $page) {
+						continue;
+					} elseif ($brokenLink['link'] == $link) {
+						$brokenLinks[] = ['page' => $page, 'link' => $link, 'status' => $brokenLink['code']];
+						continue;
+					}
+				}
 
-                    $brokenMedia[] = ['page' => $page, 'link' => $link, 'status' => 404];
-                } else {
-					$status = $this->getHTTPResponseStatus($link);
+				$status = $this->getHTTPResponseStatus($link);
 
-					if ($status['code'] === 200) continue;
-
+				if ($status['code'] === 200) {
+					$checkedLinks[] = $link;
+					continue;
+				} else {
 					$brokenLinks[] = ['page' => $page, 'link' => $link, 'status' => $status['code']];
-                }
+				}
             }
 
             $currentPageNumber++;
         }
 
-        $this->addBrokenLinksToDb($website, $brokenLinks, $brokenMedia);
+        $this->addBrokenLinksToDb($website, $brokenLinks);
 
 		$end = time();
 		$this->saveStatistic($website, count($pages), $end - $start);
-		$this->progress->updateProgress($website, $user, $currentPageNumber, count($pages));
+		$this->progress->updateProgress($user, $website, $currentPageNumber, count($pages));
 
-        return ['brokenLinks' => $brokenLinks, 'brokenMedia' => $brokenMedia];
+        return $brokenLinks;
     }
 
     /**
@@ -107,8 +113,6 @@ class Crawler
 
 			foreach ($links as $link) {
 				$link = $link->tag->getAttribute('href')['value'];
-//
-//				dump($link);
 
 				if ($this->isLinkIgnored($link)) continue;
 
@@ -134,9 +138,8 @@ class Crawler
 	 * Adds broken links to db, previously deletes all links for domain.
 	 * @param $host
 	 * @param $brokenLinks
-	 * @param $brokenMedia
 	 */
-    private function addBrokenLinksToDb($host, $brokenLinks, $brokenMedia)
+    private function addBrokenLinksToDb($host, $brokenLinks)
 	{
 		$this->em->createQueryBuilder()
 			->delete('AppBundle:BrokenLink', 'bl')
@@ -151,19 +154,6 @@ class Crawler
 			$brokenLink->link = $link['link'];
 			$brokenLink->page = $link['page'];
 			$brokenLink->status = $link['status'];
-			$brokenLink->isMedia = false;
-
-			$this->em->persist($brokenLink);
-		}
-
-		foreach ($brokenMedia as $link) {
-			$brokenLink = new BrokenLink();
-			$brokenLink->host = $host;
-			$brokenLink->link = $link['link'];
-			$brokenLink->page = $link['page'];
-			$brokenLink->status = $link['status'];
-			$brokenLink->isMedia = true;
-
 			$this->em->persist($brokenLink);
 		}
 

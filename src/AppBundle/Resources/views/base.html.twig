@@ -11,8 +11,7 @@
             <link rel="stylesheet" href="{{ asset_url }}" />
         {% endstylesheets %}
 
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+        <title>{% block title %}404 Links{% endblock %}</title>
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
@@ -21,7 +20,5 @@
         {% javascripts '@AppBundle/Resources/public/js/*' output='js/compiled/main.js'%}
             <script src="{{ asset_url }}"></script>
         {% endjavascripts %}
-
-        {% block javascripts %}{% endblock %}
     </body>
 </html>

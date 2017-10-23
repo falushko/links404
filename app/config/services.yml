@@ -9,10 +9,11 @@ services:
         class: AppBundle\Services\Crawler
         arguments: ["@em", "@app.analysis_progress"]
 
-    app.crawler.worker:
-        class: AppBundle\Services\CrawlerWorker
-        arguments: ["@app.crawler", "@em"]
+    app.analysis_progress:
+        class: AppBundle\Services\AnalysisProgress
+        arguments: ["@session", "@redis"]
 
+    # listeners
     app.exception_log.listener:
         class: AppBundle\Listener\ExceptionLogListener
         arguments: ["@app.mailer.producer"]
@@ -25,9 +26,14 @@ services:
         tags:
            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
-    app.analysis_progress:
-        class: AppBundle\Services\AnalysisProgress
-        arguments: ["@session", "@redis"]
+    # workers
+    app.crawler.worker:
+        class: AppBundle\Workers\CrawlerWorker
+        arguments: ["@app.crawler", "@em"]
+
+    app.mailer.worker:
+        class: AppBundle\Workers\MailerWorker
+        arguments: ["@app.mailer"]
 
     # aliases
     app.mailer.producer: '@old_sound_rabbit_mq.mail_producer'

@@ -12,14 +12,16 @@ class CrawlerTestCommand extends ContainerAwareCommand
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		$website = $input->getArgument('url');
+		$user = $input->getArgument('user');
 
-		$this->getContainer()->get('app.crawler')->crawl($website, 'some_user');
+		$this->getContainer()->get('app.crawler')->crawl($website, $user);
 	}
 
 	protected function configure()
 	{
 		$this->setName('crawler:test')
 			->setDescription('Greet someone')
-			->addArgument('url', InputArgument::REQUIRED);
+			->addArgument('url', InputArgument::REQUIRED)
+			->addArgument('user', InputArgument::REQUIRED);
 	}
 }

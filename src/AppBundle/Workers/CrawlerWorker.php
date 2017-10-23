@@ -1,8 +1,9 @@
 <?php
 
-namespace AppBundle\Services;
+namespace AppBundle\Workers;
 
 use AppBundle\Entity\ExceptionLog;
+use AppBundle\Services\Crawler;
 use Doctrine\ORM\EntityManager;
 use PhpAmqpLib\Message\AMQPMessage;
 

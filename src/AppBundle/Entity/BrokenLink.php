@@ -42,11 +42,6 @@ class BrokenLink
 	 */
 	public $createdAt;
 
-	/**
-	 * @ORM\Column(type="boolean")
-	 */
-	public $isMedia;
-
 	public function __construct()
 	{
 		$this->createdAt = new \DateTime();

@@ -32,6 +32,8 @@ $(function () {
             data: $("#website-submit-form").serialize(),
             success: function(data)
             {
+                console.log(data);
+
                 if (data['progress'] == finished) {
                     window.location.href = data['url'];
                 } else if (data['progress'] == inProgress) {

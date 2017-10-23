@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Feedback;
+use AppBundle\Entity\Progress;
 use AppBundle\Form\FeedbackType;
 use AppBundle\Services\AnalysisProgress;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -109,18 +110,23 @@ class MainController extends Controller
 	 */
 	public function getProgressAction(Request $request)
 	{
-		$progress = $this->get('app.analysis_progress')->getProgress($request->get('url'));
+		$user = $this->get('session')->get('user');
+		$website = $request->get('url');
+
+		$progress = $this->getDoctrine()
+			->getRepository('AppBundle:Progress')
+			->getProgress($user, $website);
 
 		if ($progress == 0) {
-			$result = ['progress' => AnalysisProgress::STARTED];
+			$result = ['progress' => Progress::STARTED];
 		} elseif ($progress == 100) {
 			$result = [
 				'url' => $this->generateUrl('result', ['url' => $request->get('url')]),
-				'progress' => AnalysisProgress::FINISHED];
+				'progress' => Progress::FINISHED];
 		} else {
 			$result = [
 				'progressPercentage' => $progress,
-				'progress' => AnalysisProgress::IN_PROGRESS];
+				'progress' => Progress::IN_PROGRESS];
 		}
 
 		return new JsonResponse($result);
