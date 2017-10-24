@@ -7,11 +7,7 @@ services:
 
     app.crawler:
         class: AppBundle\Services\Crawler
-        arguments: ["@em", "@app.analysis_progress"]
-
-    app.analysis_progress:
-        class: AppBundle\Services\AnalysisProgress
-        arguments: ["@session", "@redis"]
+        arguments: ["@em"]
 
     # listeners
     app.exception_log.listener:
@@ -24,7 +20,7 @@ services:
         class: AppBundle\Listener\BeforeActionListener
         arguments: [ "@session", "@translator.default" ]
         tags:
-           - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     # workers
     app.crawler.worker:

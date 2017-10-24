@@ -26,7 +26,7 @@ class Crawler
 		'javascript'
 	];
 
-	public function __construct(EntityManager $em, AnalysisProgress $progress)
+	public function __construct(EntityManager $em)
 	{
 		$this->em = $em;
 		$this->progress = $em->getRepository('AppBundle:Progress');
@@ -63,13 +63,13 @@ class Crawler
 				if ($this->isLinkIgnored($link)) continue;
 				if (in_array($link, $checkedLinks)) continue;
 
-				foreach ($brokenLinks as $brokenLink) {
-					if ($brokenLink['link'] == $link && $brokenLink['page'] == $page) {
-						continue;
-					} elseif ($brokenLink['link'] == $link) {
-						$brokenLinks[] = ['page' => $page, 'link' => $link, 'status' => $brokenLink['code']];
-						continue;
-					}
+				$index = array_search($link, array_column($brokenLinks, 'link'));
+
+				if ($index && $brokenLinks[$index]['page'] == $page) {
+					continue;
+				} elseif ($index) {
+					$brokenLinks[] = ['page' => $page, 'link' => $link, 'status' => $brokenLinks[$index]['status']];
+					continue;
 				}
 
 				$status = $this->getHTTPResponseStatus($link);
@@ -101,6 +101,7 @@ class Crawler
      */
     public function getAllWebsitePages(string $website) : array
     {
+    	// todo try to optimize algorithm
         $pages[] = $website;
         $counter = 0;
 
@@ -190,7 +191,7 @@ class Crawler
 	private function isLinkIgnored($link)
 	{
 		foreach ($this->ignoredLinks as $ignoredLink) {
-			if (strpos($link, $ignoredLink) === 0) return true;
+			if (strpos($link, $ignoredLink) !== false) return true;
 		}
 
 		return false;
@@ -241,8 +242,11 @@ class Crawler
         $client = new HTTPClient();
 
 		try {
-			$response = $client->head($link, ['exceptions' => false]);
-
+			$response = $client->head($link, [
+				'exceptions' => false,
+				'timeout' => 5,
+				'connect_timeout' => 5
+			]);
 			return ['code' => $response->getStatusCode(), 'phrase' => $response->getReasonPhrase()];
 		} catch (\Exception $e) {
 			return ['code' => 404, 'phrase' => 'Host does not exist.'];
