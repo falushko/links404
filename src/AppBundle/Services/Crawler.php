@@ -23,7 +23,10 @@ class Crawler
 		'http://vk.com/share.php',
 		'whatsapp://',
 		'mailto:',
-		'javascript'
+		'javascript',
+		'?reply',
+		'https://metrika.yandex.ru/',
+		'/wp-admin/'
 	];
 
 	public function __construct(EntityManager $em)
@@ -55,10 +58,14 @@ class Crawler
             $dom->load($page);
             $links = $dom->find('a');
 
+            dump('page:', $page);
+
             foreach ($links as $link) {
                 $link = $link->tag->getAttribute('href')['value'];
 				$link = $this->trimAnchor($link);
 				$link = $this->addHostIfNeeded($link, $website);
+
+				dump('link:', $link);
 
 				if ($this->isLinkIgnored($link)) continue;
 				if (in_array($link, $checkedLinks)) continue;
