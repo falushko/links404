@@ -28,7 +28,7 @@ class BrokenLink
 	public $page;
 
 	/**
-	 * @ORM\Column(type="string")
+	 * @ORM\Column(type="string", length=5000)
 	 */
 	public $link;
 
