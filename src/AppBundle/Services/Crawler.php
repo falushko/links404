@@ -7,6 +7,7 @@ use AppBundle\Entity\ExceptionLog;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client as HTTPClient;
 use PHPHtmlParser\Dom;
+use PHPHtmlParser\Exceptions\CurlException;
 
 /**
  * Moves through website, finds all pages and outbound links. Checks http response status codes.
@@ -20,13 +21,13 @@ class Crawler
 	private $ignoredLinks = [
 		'https://t.me/',
 		'https://telegram.me/',
-		'http://vk.com/share.php',
+		'http://vk.com/',
+		'https://vk.com/',
 		'whatsapp://',
 		'mailto:',
 		'javascript',
 		'?reply',
 		'https://metrika.yandex.ru/',
-		'/wp-admin/'
 	];
 
 	public function __construct(EntityManager $em)
@@ -55,17 +56,28 @@ class Crawler
         foreach ($pages as $page) {
         	$this->progress->updateProgress($user, $website, $currentPageNumber, count($pages));
 			$dom = new Dom;
-            $dom->load($page);
+
+			try {
+				$dom->load($page);
+			} catch (\Exception $exception) {
+				$exceptionLog = ExceptionLog::createFromException($exception);
+				$exceptionLog->url = $page;
+				$this->em->persist($exceptionLog);
+				$this->em->flush();
+				$currentPageNumber++;
+				continue;
+			}
+
             $links = $dom->find('a');
 
-            dump('page:', $page);
+//            dump('page:', $page);
 
             foreach ($links as $link) {
                 $link = $link->tag->getAttribute('href')['value'];
 				$link = $this->trimAnchor($link);
 				$link = $this->addHostIfNeeded($link, $website);
 
-				dump('link:', $link);
+//				dump('link:', $link);
 
 				if ($this->isLinkIgnored($link)) continue;
 				if (in_array($link, $checkedLinks)) continue;
@@ -116,24 +128,32 @@ class Crawler
             if ($counter >= count($pages)) break;
 
 			$dom = new Dom;
-			$dom->load($pages[$counter]);
-			$links = $dom->find('a');
 
-			foreach ($links as $link) {
-				$link = $link->tag->getAttribute('href')['value'];
+			try {
+				$dom->load($pages[$counter]);
+				$links = $dom->find('a');
 
-				if ($this->isLinkIgnored($link)) continue;
+				foreach ($links as $link) {
+					$link = $link->tag->getAttribute('href')['value'];
 
-				$link = $this->trimAnchor($link);
-				$link = $this->addHostIfNeeded($link, $website);
-				$link = $this->trimReplyToComment($link);
+					if ($this->isLinkIgnored($link)) continue;
 
-				if ($this->isLinkOutbound($link, $website)) continue;
-				if ($this->isLinkToMedia($link)) continue;
-				if (in_array($link, $pages)) continue;
-				if (empty($link)) continue;
+					$link = $this->trimAnchor($link);
+					$link = $this->addHostIfNeeded($link, $website);
+					$link = $this->trimReplyToComment($link);
 
-				$pages[] = $link;
+					if ($this->isLinkOutbound($link, $website)) continue;
+					if ($this->isLinkToMedia($link)) continue;
+					if (in_array($link, $pages)) continue;
+					if (empty($link)) continue;
+
+					$pages[] = $link;
+				}
+			} catch (CurlException $exception) {
+				$exceptionLog = ExceptionLog::createFromException($exception);
+				$exceptionLog->url = $pages[$counter];
+				$this->em->persist($exceptionLog);
+				$this->em->flush();
 			}
 
 			$counter++;

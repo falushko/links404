@@ -25,10 +25,10 @@ class ExceptionLogListener
 	 */
 	public function postPersist(LifecycleEventArgs $args)
 	{
-		$exceptionLog = $args->getEntity();
-
-		if (!$exceptionLog instanceof ExceptionLog) return;
-
-		$this->mailerProducer->publish(serialize($exceptionLog));
+//		$exceptionLog = $args->getEntity();
+//
+//		if (!$exceptionLog instanceof ExceptionLog) return;
+//
+//		$this->mailerProducer->publish(serialize($exceptionLog));
 	}
 }
