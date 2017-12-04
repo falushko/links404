@@ -26,8 +26,5 @@ class BeforeActionListener
 	{
 		$user = $this->session->get('user');
 		if (!$user) $this->session->set('user', uniqid ('user_id_', true));
-
-		$language = $this->session->get('language', 'en');
-		$this->translator->setLocale($language);
 	}
 }

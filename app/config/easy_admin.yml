@@ -6,7 +6,6 @@ easy_admin:
             - { entity: 'BrokenLink', icon: 'list' }
             - { entity: 'ExceptionLog', icon: 'exclamation-triangle' }
             - { entity: 'Feedback', icon: 'inbox' }
-            - { entity: 'News', icon: 'file-text-o' }
             - { entity: 'Statistic', icon: 'line-chart' }
     list:
         title: '%%entity_label%%'
@@ -46,7 +45,3 @@ easy_admin:
             class: AppBundle\Entity\Feedback
             disabled_actions: ['new', 'edit', 'delete']
             label: 'Feedbacks'
-
-        News:
-            class: AppBundle\Entity\News
-            label: 'News'

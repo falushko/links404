@@ -5,17 +5,17 @@
 {% block content %}
     <div class="container">
         <h2>{{ host }}</h2>
-        <p>{{ 'pages_analysed'|trans }}: {{ statistic.pagesAmount }}<br>
-            {{ 'analysis_time'|trans }}: {{ statistic.analysisTimeFormatted }}</p>
+        <p>Pages analysed: {{ statistic.pagesAmount }}<br>
+            Analysis time: {{ statistic.analysisTimeFormatted }}</p>
 
         {{ knp_pagination_render(pagination) }}
 
         <div class="table-responsive">
             <table class="table table-hover table-bordered">
                 <tr class="active">
-                    <th>{{ 'broken_link'|trans }}</th>
-                    <th>{{ 'page'|trans }}</th>
-                    <th>{{ 'status'|trans }}</th>
+                    <th>Broken link</th>
+                    <th>Page</th>
+                    <th>Status</th>
                 </tr>
 
                 {% for link in pagination %}

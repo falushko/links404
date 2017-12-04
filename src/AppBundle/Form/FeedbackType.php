@@ -18,21 +18,21 @@ class FeedbackType extends AbstractType
 				'label' => false,
 				'attr' => [
 					'class'=>'form-control',
-					'placeholder' => 'name',
+					'placeholder' => 'Name',
 				]])
 
 			->add('email', TextType::class, [
 				'label' => false,
 				'attr' => [
 					'class'=>'form-control',
-					'placeholder' => 'email',
+					'placeholder' => 'Email',
 				]])
 
 			->add('message', TextareaType::class, [
 				'label' => false,
 				'attr' => [
 					'class'=>'form-control',
-					'placeholder' => 'message',
+					'placeholder' => 'Message',
 					'rows' => 4,
 				]]);
     }

@@ -20,26 +20,21 @@ class Feedback
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Assert\NotBlank(message = "name_blank")
+     * @Assert\NotBlank()
      */
     public $name;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Assert\NotBlank(message = "email_blank")
-     * @Assert\Email(message = "email_invalid")
+     * @Assert\NotBlank()
+     * @Assert\Email()
      */
     public $email;
 
     /**
      * @ORM\Column(type="string", length=2000)
-     * @Assert\NotBlank(message = "message_blank")
-     * @Assert\Length(
-     *      min = 3,
-     *      max = 2000,
-     *      minMessage = "message_short",
-     *      maxMessage = "message_long",
-     * )
+     * @Assert\NotBlank()
+     * @Assert\Length(min = 3, max = 2000)
      */
     public $message;
 

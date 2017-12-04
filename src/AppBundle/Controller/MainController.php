@@ -5,7 +5,6 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Feedback;
 use AppBundle\Entity\Progress;
 use AppBundle\Form\FeedbackType;
-use AppBundle\Services\AnalysisProgress;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -84,25 +83,6 @@ class MainController extends Controller
     }
 
 	/**
-	 * @Route("/news", name="news")
-	 * @Method({"GET"})
-	 * @Template
-	 * @param Request $request
-	 * @return array
-	 */
-    public function newsAction(Request $request)
-	{
-		$newsQuery = $this->getDoctrine()
-			->getRepository('AppBundle:News')
-			->getAllQuery($this->get('session')->get('language', 'en'));
-
-		$pagination = $this->get('knp_paginator')
-			->paginate($newsQuery, $request->query->getInt('page', 1), 20);
-
-		return ['pagination' => $pagination];
-	}
-
-	/**
 	 * @Route("/progress", name="progress")
 	 * @Method({"GET"})
 	 * @param Request $request
@@ -130,20 +110,6 @@ class MainController extends Controller
 		}
 
 		return new JsonResponse($result);
-	}
-
-	/**
-	 * @Route("/language/{language}", name="language")
-	 * @Method({"GET"})
-	 * @param Request $request
-	 * @param $language
-	 * @return \Symfony\Component\HttpFoundation\RedirectResponse
-	 */
-	public function languageAction(Request $request, $language)
-	{
-		$this->get('session')->set('language', $language);
-
-		return $this->redirect($request->headers->get('referer'));
 	}
 
 	/**
