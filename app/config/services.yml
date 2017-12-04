@@ -10,12 +10,6 @@ services:
         arguments: ["@em"]
 
     # listeners
-    app.exception_log.listener:
-        class: AppBundle\Listener\ExceptionLogListener
-        arguments: ["@app.mailer.producer"]
-        tags:
-            - { name: doctrine.event_listener, event: postPersist }
-
     app.before_action.listener:
         class: AppBundle\Listener\BeforeActionListener
         arguments: [ "@session", "@translator.default" ]

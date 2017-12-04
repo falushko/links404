@@ -44,6 +44,8 @@ class Crawler
 	 */
     public function crawl(string $website, $user) : array
     {
+    	// todo there are a cases with links like href='Interview' need to add slash at the beginning if needed
+
 		$start = time();
 
 		set_time_limit(0);

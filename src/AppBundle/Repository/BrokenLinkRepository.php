@@ -12,8 +12,7 @@ class BrokenLinkRepository extends EntityRepository
 			->select('bl')
 			->where('bl.host = :host')
 			->setParameter('host', $host)
-			->orderBy('bl.isMedia', 'DESC')
-			->orderBy('bl.status')
+			->orderBy('bl.link')
 			->getQuery();
 	}
 }
