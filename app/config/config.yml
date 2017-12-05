@@ -2,7 +2,6 @@ imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: services.yml }
-    - { resource: rabbit_mq.yml }
     - { resource: easy_admin.yml }
 
 parameters:
@@ -82,9 +81,22 @@ knp_paginator:
     template:
         pagination: 'KnpPaginatorBundle:Pagination:twitter_bootstrap_v3_pagination.html.twig'
 
-snc_redis:
-    clients:
-        default:
-            type: predis
-            alias: default
-            dsn: redis://localhost
+#snc_redis:
+#    clients:
+#        default:
+#            type: predis
+#            alias: default
+#            dsn: redis://localhost
+
+enqueue:
+    transport:
+        default: "redis"
+
+        redis:
+            host: 127.0.0.1
+            port: 6379
+            vendor: predis
+            persisted: false
+            lazy: false
+
+    client: ~

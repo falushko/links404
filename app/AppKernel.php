@@ -17,11 +17,10 @@ class AppKernel extends Kernel
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new AppBundle\AppBundle(),
             new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
-            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
 			new Symfony\Bundle\AsseticBundle\AsseticBundle(),
 			new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(),
 			new JavierEguiluz\Bundle\EasyAdminBundle\EasyAdminBundle(),
-			new Snc\RedisBundle\SncRedisBundle()
+            new Enqueue\Bundle\EnqueueBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {
