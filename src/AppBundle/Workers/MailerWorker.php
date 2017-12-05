@@ -32,11 +32,10 @@ class MailerWorker implements PsrProcessor, TopicSubscriberInterface
 
         $message = unserialize($message->getBody());
 
-        if ($message instanceof Feedback) {
+        if ($message instanceof Feedback)
             $this->mailer->sendFeedbackMessage($message);
-        } elseif ($message instanceof ExceptionLog) {
+        elseif ($message instanceof ExceptionLog)
             $this->mailer->sendExceptionLogMessage($message);
-        }
 
         return self::ACK;
     }
