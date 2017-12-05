@@ -18,15 +18,14 @@ services:
 
     # workers
     app.crawler.worker:
-        class: AppBundle\Workers\CrawlerWorker
+        class: 'AppBundle\Workers\CrawlerWorker'
         arguments: ["@app.crawler", "@em"]
+        tags:
+            - { name: 'enqueue.client.processor' }
 
     app.mailer.worker:
         class: AppBundle\Workers\MailerWorker
         arguments: ["@app.mailer"]
 
     # aliases
-    app.mailer.producer: '@old_sound_rabbit_mq.mail_producer'
-    app.crawler.producer: '@old_sound_rabbit_mq.crawl_producer'
     em: '@doctrine.orm.default_entity_manager'
-    redis: '@snc_redis.default'

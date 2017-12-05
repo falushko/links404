@@ -5,15 +5,17 @@ namespace AppBundle\Workers;
 use AppBundle\Entity\ExceptionLog;
 use AppBundle\Entity\Feedback;
 use AppBundle\Services\Mailer;
-use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
-use PhpAmqpLib\Message\AMQPMessage;
+use Interop\Queue\PsrMessage;
+use Interop\Queue\PsrContext;
+use Interop\Queue\PsrProcessor;
+use Enqueue\Client\TopicSubscriberInterface;
 
 /**
- * It is mailer consumer. To start consume message run: bin/console rabbitmq:consumer mail &
+ * It is mailer consumer. To start consume message run: bin/console enqueue:consume --setup-broker
  * Class Mailer
  * @package AppBundle\Services
  */
-class MailerWorker implements ConsumerInterface
+class MailerWorker implements PsrProcessor, TopicSubscriberInterface
 {
 	private $mailer;
 
@@ -22,14 +24,24 @@ class MailerWorker implements ConsumerInterface
 		$this->mailer = $mailer;
 	}
 
-    public function execute(AMQPMessage $message)
+    public function process(PsrMessage $message, PsrContext $session)
     {
+        $website = json_decode($message->getBody())->url;
+        $user = json_decode($message->getBody())->user;
+
         $message = unserialize($message->getBody());
 
-		if ($message instanceof Feedback) {
-			$this->mailer->sendFeedbackMessage($message);
-		} elseif ($message instanceof ExceptionLog) {
-			$this->mailer->sendExceptionLogMessage($message);
-		}
+        if ($message instanceof Feedback) {
+            $this->mailer->sendFeedbackMessage($message);
+        } elseif ($message instanceof ExceptionLog) {
+            $this->mailer->sendExceptionLogMessage($message);
+        }
+
+        return self::ACK;
+    }
+
+    public static function getSubscribedTopics()
+    {
+        return ['mailer'];
     }
 }

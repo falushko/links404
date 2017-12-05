@@ -25,10 +25,10 @@ class MainController extends Controller
 	{
 		if ($request->getMethod() == 'GET') return;
 
-		$this->get('app.crawler.producer')->publish(serialize([
-			'url' => $request->get('url'),
-			'user' =>  $this->get('session')->get('user')
-		]));
+		$this->get('enqueue.producer')->sendEvent('crawler', [
+            'url' => $request->get('url'),
+            'user' =>  $this->get('session')->get('user')
+        ]);
 
 		return new JsonResponse();
 	}
@@ -74,7 +74,7 @@ class MainController extends Controller
 			$this->get('em')->persist($feedback);
 			$this->get('em')->flush();
 
-			$this->get('app.mailer.producer')->publish(serialize($feedback));
+            $this->get('enqueue.producer')->sendEvent('mailer', serialize($feedback));
 			$this->addFlash('success', 'successful_feedback');
 			return $this->redirectToRoute('contacts');
 		}
