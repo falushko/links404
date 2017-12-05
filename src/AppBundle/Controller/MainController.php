@@ -21,11 +21,11 @@ class MainController extends Controller
 	 * @Method({"GET", "POST"})
 	 * @Template
 	 * @param Request $request
-	 * @return string
-	 */
+	 * @return array|string|JsonResponse
+     */
     public function indexAction(Request $request)
 	{
-		if ($request->getMethod() == 'GET') return;
+		if ($request->getMethod() == 'GET') return [];
 
 		$this->get('enqueue.producer')->sendEvent('crawler', [
             'url' => $request->get('url'),
