@@ -8,9 +8,11 @@ use AppBundle\Form\FeedbackType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\HttpFoundation\Response;
 
 class MainController extends Controller
 {
@@ -45,7 +47,7 @@ class MainController extends Controller
 	 * @Method({"GET"})
 	 * @Template
 	 * @param Request $request
-	 * @return array|\Symfony\Component\HttpFoundation\Response
+	 * @return array|Response
 	 */
     public function resultAction(Request $request)
     {
@@ -62,7 +64,7 @@ class MainController extends Controller
 	 * @Method({"GET", "POST"})
 	 * @Template
 	 * @param Request $request
-	 * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+	 * @return array|RedirectResponse
 	 */
     public function contactsAction(Request $request)
     {
