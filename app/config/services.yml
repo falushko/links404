@@ -1,6 +1,21 @@
 parameters:
 
 services:
+#
+#    _defaults:
+#        autowire: true
+#        autoconfigure: true
+#        public: false
+#
+#    AppBundle\:
+#        resource: '../../src/AppBundle/*'
+#        exclude: '../../src/AppBundle/{Entity,Migrations,Repository}'
+#
+#    AppBundle\Controller\:
+#        resource: '../../src/AppBundle/Controller'
+#        tags: ['controller.service_arguments']
+
+
     app.mailer:
         class: AppBundle\Services\Mailer
         arguments: ["@twig", "@mailer"]
