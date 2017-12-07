@@ -24,6 +24,9 @@ services:
         class: AppBundle\Services\Crawler
         arguments: ["@em"]
 
+    app.report.generator:
+        class: AppBundle\Services\ReportGenerator
+
     # listeners
     app.before_action.listener:
         class: AppBundle\Listener\BeforeActionListener

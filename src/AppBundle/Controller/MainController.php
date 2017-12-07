@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MainController extends Controller
 {
@@ -57,6 +58,20 @@ class MainController extends Controller
 		$pagination = $this->get('knp_paginator')->paginate($brokenLinkQuery, $request->query->getInt('page', 1), 20);
 
 		return ['pagination' => $pagination, 'host' => $host, 'statistic' => $statistic];
+    }
+
+    /**
+     * @Route("/csv", name="csv")
+     * @Method({"GET"})
+     * @param Request $request
+     * @return StreamedResponse
+     */
+    public function csvAction(Request $request)
+    {
+        $data = $this->getDoctrine()->getRepository('AppBundle:BrokenLink')->findAllByHost($request->get('url'));
+        $response = $this->get('app.report.generator')->getCsvReport($data);
+
+        return $response;
     }
 
 	/**

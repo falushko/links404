@@ -15,4 +15,9 @@ class BrokenLinkRepository extends EntityRepository
 			->orderBy('bl.link')
 			->getQuery();
 	}
+
+    public function findAllByHost($host)
+    {
+        return $this->findByHost($host)->getResult();
+    }
 }
