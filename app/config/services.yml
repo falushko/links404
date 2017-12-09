@@ -1,20 +1,6 @@
 parameters:
 
 services:
-#
-#    _defaults:
-#        autowire: true
-#        autoconfigure: true
-#        public: false
-#
-#    AppBundle\:
-#        resource: '../../src/AppBundle/*'
-#        exclude: '../../src/AppBundle/{Entity,Migrations,Repository}'
-#
-#    AppBundle\Controller\:
-#        resource: '../../src/AppBundle/Controller'
-#        tags: ['controller.service_arguments']
-
 
     app.mailer:
         class: AppBundle\Services\Mailer
@@ -34,6 +20,12 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
+    app.exception_log.listener:
+        class: AppBundle\Listener\ExceptionLogListener
+        arguments: ["@enqueue.producer"]
+        tags:
+            - { name: doctrine.event_listener, event: postPersist }
+
     # workers
     app.crawler.worker:
         class: 'AppBundle\Workers\CrawlerWorker'
@@ -44,6 +36,21 @@ services:
     app.mailer.worker:
         class: AppBundle\Workers\MailerWorker
         arguments: ["@app.mailer"]
+        tags:
+            - { name: 'enqueue.client.processor' }
 
     # aliases
     em: '@doctrine.orm.default_entity_manager'
+
+    #    _defaults:
+    #        autowire: true
+    #        autoconfigure: true
+    #        public: false
+    #
+    #    AppBundle\:
+    #        resource: '../../src/AppBundle/*'
+    #        exclude: '../../src/AppBundle/{Entity,Migrations,Repository}'
+    #
+    #    AppBundle\Controller\:
+    #        resource: '../../src/AppBundle/Controller'
+    #        tags: ['controller.service_arguments']

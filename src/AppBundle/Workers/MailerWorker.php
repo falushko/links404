@@ -26,10 +26,6 @@ class MailerWorker implements PsrProcessor, TopicSubscriberInterface
 
     public function process(PsrMessage $message, PsrContext $session)
     {
-        // todo implement this shit
-        $website = json_decode($message->getBody())->url;
-        $user = json_decode($message->getBody())->user;
-
         $message = unserialize($message->getBody());
 
         if ($message instanceof Feedback)
