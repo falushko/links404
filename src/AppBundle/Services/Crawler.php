@@ -209,6 +209,8 @@ class Crawler
 	{
 		if (strpos($link, "http") === 0) return $link;
 
+		$link = strpos($link, "/") === 0 ? $link : '/' . $link;
+
 		return (strpos($link, $host) === false) ? rtrim($host, '/') . $link : $link;
 	}
 

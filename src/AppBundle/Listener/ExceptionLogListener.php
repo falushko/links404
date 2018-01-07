@@ -27,8 +27,7 @@ class ExceptionLogListener
 	{
 		$exceptionLog = $args->getEntity();
 
-		if (!$exceptionLog instanceof ExceptionLog) return;
-
-		$this->producer->sendEvent('mailer', serialize($exceptionLog));
+		if ($exceptionLog instanceof ExceptionLog)
+			$this->producer->sendEvent('mailer', serialize($exceptionLog));
 	}
 }
